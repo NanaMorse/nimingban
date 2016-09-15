@@ -4,7 +4,7 @@ import ViewStyle = __React.ViewStyle;
 import TextStyle = __React.TextStyle;
 
 const styles = StyleSheet.create({
-  headerStyle: {
+  header: {
     padding: 10,
     paddingTop: 20,
     height: 55,
@@ -14,33 +14,39 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   } as ViewStyle,
 
-  headerBtnStyle: {
+  headerBtn: {
     width: 25,
     height: 25
   } as ViewStyle,
 
-  headerTextStyle: {
+  headerText: {
     color: '#fff'
   } as TextStyle,
 
-  slideMenuToggleBtnStyle: {
+  slideMenuToggleBtn: {
     backgroundColor: 'powderblue'
   } as ViewStyle,
 
-  saySomeThingBtnShowStyle: {
+  saySomeThingBtnShow: {
     backgroundColor: 'red'
   } as ViewStyle,
 
-  saySomeThingBtnHideStyle: {
+  saySomeThingBtnHide: {
     opacity: 0
   } as ViewStyle
 });
 
-interface headerState {
+interface Props {
+  content: string;
+
+  onSideMenuToggled: Function;
+}
+
+interface State {
   showSaySomethingBtn: boolean;
 }
 
-class Header extends React.Component<any, headerState> {
+class Header extends React.Component<Props, State> {
   constructor() {
     super();
 
@@ -50,25 +56,23 @@ class Header extends React.Component<any, headerState> {
   }
 
   onSlideMenuToggled() {
-    this.setState({
-      showSaySomethingBtn: !this.state.showSaySomethingBtn
-    })
+    this.props.onSideMenuToggled();
   }
 
   render() {
 
     const saySomethingBtnStyle = [
-      styles.headerBtnStyle,
+      styles.headerBtn,
       this.state.showSaySomethingBtn ?
-        styles.saySomeThingBtnShowStyle : styles.saySomeThingBtnHideStyle
+        styles.saySomeThingBtnShow : styles.saySomeThingBtnHide
     ];
 
     return (
-      <View style={styles.headerStyle} >
+      <View style={styles.header} >
         <TouchableHighlight onPress={() => this.onSlideMenuToggled()}>
-          <View style={[styles.headerBtnStyle, styles.slideMenuToggleBtnStyle]}/>
+          <View style={[styles.headerBtn, styles.slideMenuToggleBtn]}/>
         </TouchableHighlight>
-        <Text style={styles.headerTextStyle}>nimingban</Text>
+        <Text style={styles.headerText}>{this.props.content}</Text>
         <View style={saySomethingBtnStyle} />
       </View>
     )
