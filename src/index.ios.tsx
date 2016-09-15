@@ -1,5 +1,7 @@
 import * as React from "react";
-import Main from './components/Main';
+import { View } from 'react-native';
+
+import Header from './components/Header'
 
 interface Props {
 
@@ -10,7 +12,15 @@ interface State {
 }
 
 export default class extends React.Component<Props, State> {
+  constructor() {
+    super();
+  }
+
   render() {
-    return <Main />
+    return (
+      <View style={{flex: 1}}>
+        <Header/>
+      </View>
+    );
   }
 }
