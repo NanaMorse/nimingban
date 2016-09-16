@@ -84,36 +84,33 @@ class SideMenu extends React.Component<Props, State> {
   constructor() {
     super();
 
-    this.state = {
-      slideAnimate: new Animated.Value(0)
-    }
+    this.state = {} as State;
+  }
+  
+  componentWillMount() {
+    this.state.slideAnimate = new Animated.Value(this.props.show ? defaultMenuWidth : 0);
   }
 
   componentWillReceiveProps(props: Props) {
     const toValue = props.show ? defaultMenuWidth : 0;
-
+    
     Animated.timing(this.state.slideAnimate, {
       toValue,
-      duration: 250,
-      easing: Easing.in
+      duration: 250
     } as any).start()
   }
 
   render() {
     
-    const sideMenuStyle = [styles.sideMenu];
-    const appViewStyle = [styles.appView];
-    if (this.props.show) {
-      sideMenuStyle.push({width: defaultMenuWidth});
-      appViewStyle.push({marginLeft: defaultMenuWidth});
-    }
+    const sideMenuStyle = [styles.sideMenu, {width: this.state.slideAnimate}];
+    const appViewStyle = [styles.appView, {marginLeft: this.state.slideAnimate}];
     
     return (
       <View style={styles.container}>
-        <View style={sideMenuStyle}></View>
-        <View style={appViewStyle}>
+        <Animated.View style={sideMenuStyle}></Animated.View>
+        <Animated.View style={appViewStyle}>
           {this.props.children}
-        </View>
+        </Animated.View>
       </View>
     );
   }
