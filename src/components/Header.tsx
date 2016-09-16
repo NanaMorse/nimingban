@@ -1,13 +1,12 @@
 import * as React from "react";
 import { View, Text, TouchableHighlight, StyleSheet } from 'react-native';
+import * as DefaultStyles from '../constants/defaultStyles';
+
 import ViewStyle = __React.ViewStyle;
 import TextStyle = __React.TextStyle;
 
 const styles = StyleSheet.create({
   header: {
-    padding: 10,
-    paddingTop: 20,
-    height: 55,
     backgroundColor: 'steelblue',
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -68,7 +67,7 @@ class Header extends React.Component<Props, State> {
     ];
 
     return (
-      <View style={styles.header} >
+      <View style={[DefaultStyles.HEADER, styles.header]} >
         <TouchableHighlight onPress={() => this.onSlideMenuToggled()}>
           <View style={[styles.headerBtn, styles.slideMenuToggleBtn]}/>
         </TouchableHighlight>

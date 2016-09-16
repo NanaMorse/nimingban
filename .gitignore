@@ -42,3 +42,4 @@ android/keystores/debug.keystore
 
 # typings
 typings/globals
+/ios/nimingban.xcodeproj/project.pbxproj
