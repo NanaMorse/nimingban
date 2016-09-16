@@ -1,12 +1,11 @@
 {
     "compilerOptions": {
         "target": "es2015",
-        "module": "es2015",
+        "module": "commonjs",
         "jsx": "react",
         "outDir": "build",
         "rootDir": "src",
         "allowSyntheticDefaultImports": true,
-        "noImplicitAny": true,
         "experimentalDecorators": true,
         "preserveConstEnums": true,
         "allowJs": true,

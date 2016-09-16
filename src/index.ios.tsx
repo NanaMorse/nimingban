@@ -1,8 +1,11 @@
 import * as React from "react";
 import { View } from 'react-native';
+import { Provider } from 'react-redux';
 
-import SideMenu from './components/SideMenu';
-import Header from './components/Header'
+import SideMenuContainer from './containers/SideMenuContainer';
+import HeaderContainer from './containers/HeaderContainer';
+
+import store from './store';
 
 interface Props {
 
@@ -42,11 +45,13 @@ export default class extends React.Component<Props, State> {
     };
     
     return (
-      <SideMenu {...sideMenuProps}>
-        <View style={{flex: 1}}>
-          <Header {...headerProps}/>
-        </View>
-      </SideMenu>
+      <Provider store = { store }>
+        <SideMenuContainer {...sideMenuProps}>
+          <View style={{flex: 1}}>
+            <HeaderContainer {...headerProps}/>
+          </View>
+        </SideMenuContainer>
+      </Provider>
     );
   }
 }
