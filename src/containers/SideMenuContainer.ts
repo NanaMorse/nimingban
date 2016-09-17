@@ -1,5 +1,6 @@
 import { connect } from 'react-redux';
 import SideMenu from '../components/SideMenu';
+import * as Actions from '../actions';
 
 function mapStateToProps(state) {
   return state.sideMenu;
@@ -7,7 +8,9 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    
+    tryRequestForumList: function () {
+      dispatch(Actions.tryRequestForumList());
+    }
   }
 }
 

@@ -8,7 +8,8 @@ import {
   ScrollView,
   Text,
   TouchableHighlight,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  RefreshControl
 } from 'react-native';
 import * as DefaultStyles from '../constants/defaultStyles';
 
@@ -231,6 +232,7 @@ interface SideMenuProps {
   show: boolean;
   forumList: ForumListInfo[];
   onChange: Function;
+  tryRequestForumList: Function;
 }
 
 interface SideMenuState {
@@ -320,6 +322,12 @@ class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
     this.openSideMenu(false, subForumInfo);
   }
 
+  onRefreshControl() {
+    return (
+      <RefreshControl onRefresh={() => this.props.tryRequestForumList()}/>
+    );
+  }
+
   wrapperTouchContentView() {
     let overlay = null;
     if (this.props.show) {
@@ -349,7 +357,7 @@ class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
       <View style={styles.container}>
         <Animated.View style={sideMenuStyle}>
           <SideMenuHeader />
-          <ScrollView>
+          <ScrollView refreshControl={this.onRefreshControl()}>
             {generateForumListWrappers(forumList, this.onSubForumSelected.bind(this))}
           </ScrollView>
         </Animated.View>
