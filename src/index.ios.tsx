@@ -37,11 +37,17 @@ export default class extends React.Component<Props, State> {
     
     const sideMenuProps = {
       show: this.state.showSideMenu,
-      onChange: (show) => {
+      onChange: (show, selectedForum?) => {
         if (show === this.state.showSideMenu) return;
         this.setState({
           showSideMenu: show
-        })
+        });
+
+        if (selectedForum) {
+          this.setState({
+            headerContent: selectedForum.name
+          });
+        }
       }
     };
     

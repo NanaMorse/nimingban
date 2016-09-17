@@ -101,8 +101,7 @@ const styles = StyleSheet.create({
 
   subListWrapperShow: {
     borderTopColor: 'rgba(0, 0, 0, 0.3)',
-    borderTopWidth: 1,
-    paddingLeft: 15
+    borderTopWidth: 1
   } as ViewStyle,
 
   subListItem: {
@@ -113,7 +112,8 @@ const styles = StyleSheet.create({
   } as ViewStyle,
 
   subListItemText: {
-    color: '#ccc'
+    color: '#ccc',
+    marginLeft: 15
   } as TextStyle
 });
 
@@ -134,8 +134,35 @@ interface ForumListInfo {
   name: string;
 }
 
+const SubListWrapper = (props) => {
+
+  const listItems = props.forums.map((forumInfo, index) => {
+
+    const onPress = () => {
+      props.onSubForumSelected(forumInfo);
+    };
+
+    return (
+      <TouchableHighlight key={index} onPress={onPress}>
+        <View style={props.listItemStyle}>
+          <Text style={styles.subListItemText}>{forumInfo.name}</Text>
+        </View>
+      </TouchableHighlight>
+    );
+  });
+
+  return (
+    <Animated.View style={props.wrapperStyle}>
+      <View style={styles.subListWrapperShow}>
+        {listItems}
+      </View>
+    </Animated.View>
+  );
+};
+
 interface ListWrapperProps {
-  forumListInfo: ForumListInfo
+  forumListInfo: ForumListInfo;
+  onSubForumSelected: Function
 }
 
 interface ListWrapperState {
@@ -187,7 +214,8 @@ class ListWrapper extends React.Component<ListWrapperProps, ListWrapperState> {
         {height: this.state.dropDownAnimate}
       ],
       listItemStyle: [styles.subListItem],
-      forums: forumListInfo.forums
+      forums: forumListInfo.forums,
+      onSubForumSelected: this.props.onSubForumSelected
     };
 
     return (
@@ -198,26 +226,6 @@ class ListWrapper extends React.Component<ListWrapperProps, ListWrapperState> {
     );
   }
 }
-
-const SubListWrapper = (props) => {
-
-  const listItems = props.forums.map((forumInfo, index) => {
-    return (
-      <View key={index} style={props.listItemStyle}>
-        <Text style={styles.subListItemText}>{forumInfo.name}</Text>
-      </View>
-    );
-  });
-
-  return (
-    <Animated.View style={props.wrapperStyle}>
-      <View style={styles.subListWrapperShow}>
-        {listItems}
-      </View>
-    </Animated.View>
-  );
-};
-
 
 interface SideMenuProps {
   show: boolean;
@@ -230,7 +238,6 @@ interface SideMenuState {
   prevLeft?: number;
   responder?: any;
 }
-
 
 class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
   constructor(props) {
@@ -295,7 +302,7 @@ class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
   }
   // pan event end
   
-  openSideMenu(isOpen) {
+  openSideMenu(isOpen, forumInfo?) {
 
     const newOffSet = isOpen ? defaultMenuWidth : 0;
 
@@ -306,7 +313,11 @@ class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
 
     this.state.prevLeft = newOffSet;
     this.forceUpdate();
-    this.props.onChange(isOpen);
+    this.props.onChange(isOpen, forumInfo);
+  }
+
+  onSubForumSelected(subForumInfo) {
+    this.openSideMenu(false, subForumInfo);
   }
 
   wrapperTouchContentView() {
@@ -339,7 +350,7 @@ class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
         <Animated.View style={sideMenuStyle}>
           <SideMenuHeader />
           <ScrollView>
-            {generateForumListWrappers(forumList)}
+            {generateForumListWrappers(forumList, this.onSubForumSelected.bind(this))}
           </ScrollView>
         </Animated.View>
         {this.wrapperTouchContentView()}
@@ -348,9 +359,9 @@ class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
   }
 }
 
-function generateForumListWrappers(forumListData: ForumListInfo[]) {
+function generateForumListWrappers(forumListData: ForumListInfo[], onSubForumSelected) {
   return forumListData.map((forumListInfo, index) => {
-    return <ListWrapper key={index} forumListInfo={forumListInfo} />
+    return <ListWrapper key={index} forumListInfo={forumListInfo} onSubForumSelected={onSubForumSelected}/>
   });
 }
 
