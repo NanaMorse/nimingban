@@ -1,5 +1,5 @@
 import * as React from "react";
-import { View, Animated, StyleSheet, Dimensions, ScrollView, Text } from 'react-native';
+import { View, Animated, StyleSheet, Dimensions, ScrollView, Text, TouchableHighlight } from 'react-native';
 import * as DefaultStyles from '../constants/defaultStyles';
 
 
@@ -28,6 +28,7 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   
   sideMenuHeader: {
+    paddingLeft: 15,
     backgroundColor: '#404040',
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
@@ -38,25 +39,49 @@ const styles = StyleSheet.create({
     color: '#ccc'
   } as TextStyle,
 
-  ListHeader: {
+  listWrapper: {
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start'
+  } as ViewStyle,
+
+  listHeader: {
+    flexDirection: 'row',
+    width: defaultMenuWidth,
     height: 40,
     padding: 10,
     paddingLeft: 15,
-    borderTopColor: 'rgba(0,0,0,0.3)',
-    borderTopWidth: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    flexDirection: 'row'
+    backgroundColor: '#404040',
+    borderTopColor: 'rgba(0, 0, 0, 0.3)',
+    borderTopWidth: 1
   } as ViewStyle,
 
-  ListHeaderText: {
-    color: '#fff',
-    flexWrap: 'nowrap'
+  listHeaderText: {
+    color: '#fff'
   } as TextStyle,
 
-  ListWrapper: {
+  subListAnimateWrapper: {
+    flex: 1,
+    width: defaultMenuWidth,
+    height: 20,
+    overflow: 'hidden'
+  } as ViewStyle,
 
-  }
+  subListWrapperShow: {
+    borderTopColor: 'rgba(0, 0, 0, 0.3)',
+    borderTopWidth: 1,
+    paddingLeft: 15
+  } as ViewStyle,
+
+  subListItem: {
+    flex: 1,
+    height: 40,
+    flexDirection: 'row',
+    alignItems: 'center'
+  } as ViewStyle,
+
+  subListItemText: {
+    color: '#ccc'
+  } as TextStyle
 });
 
 const SideMenuHeader = () => {
@@ -67,36 +92,99 @@ const SideMenuHeader = () => {
   );
 };
 
+interface ForumInfo {
+  name: string;
+}
+
 interface ForumListInfo {
-  name: string
+  forums: ForumInfo[];
+  name: string;
 }
 
-interface ListHeaderProps {
-  listInfo: ForumListInfo
+interface ListWrapperProps {
+  forumListInfo: ForumListInfo
 }
 
-interface ListHeaderState {
-
+interface ListWrapperState {
+  showSubListWrapper?: boolean;
+  dropDownAnimate?: any
 }
 
-class ListHeader extends React.Component<ListHeaderProps, ListHeaderState> {
+class ListWrapper extends React.Component<ListWrapperProps, ListWrapperState> {
   constructor() {
     super();
 
+    this.state = {
+      showSubListWrapper: false,
+      dropDownAnimate: new Animated.Value(0)
+    }
+  }
+
+  onSubListWrapperToggled() {
+    const toShow = !this.state.showSubListWrapper;
+
+    this.setState({
+      showSubListWrapper: toShow
+    });
+
+    const toValue = toShow ? this.props.forumListInfo.forums.length * 40 : 0;
+    Animated.timing(this.state.dropDownAnimate, {
+      toValue,
+      duration: 250
+    } as any).start()
   }
 
   render() {
 
+    const forumListInfo = this.props.forumListInfo;
+
+    const ListHeader = () => {
+      return (
+        <TouchableHighlight onPress={() => this.onSubListWrapperToggled()}>
+          <View style={styles.listHeader}>
+            <Text style={styles.listHeaderText}>{forumListInfo.name}</Text>
+          </View>
+        </TouchableHighlight>
+      )
+    };
+
+    const subListWrapperProps = {
+      wrapperStyle: [
+        styles.subListAnimateWrapper,
+        {height: this.state.dropDownAnimate}
+      ],
+      listItemStyle: [styles.subListItem],
+      forums: forumListInfo.forums
+    };
+
     return (
-      <View style={styles.ListHeader}>
-        <Text style={styles.ListHeaderText}>{this.props.listInfo.name}</Text>
+      <View style={styles.listWrapper}>
+        <ListHeader />
+        <SubListWrapper {...subListWrapperProps}/>
       </View>
     );
   }
 }
 
-const ListWrapper = ({subForum}) => {
 
+
+const SubListWrapper = (props) => {
+
+  const listItems = props.forums.map((forumInfo, index) => {
+    return (
+      <View key={index} style={props.listItemStyle}>
+        <Text style={styles.subListItemText}>{forumInfo.name}</Text>
+      </View>
+    );
+  });
+
+  return (
+    <Animated.View style={props.wrapperStyle}>
+      <View style={styles.subListWrapperShow}>
+        {listItems}
+      </View>
+    </Animated.View>
+  );
 };
 
 
@@ -118,8 +206,6 @@ class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
   }
   
   componentWillMount() {
-    console.log(this.props);
-
     this.state.slideAnimate = new Animated.Value(this.props.show ? defaultMenuWidth : 0);
   }
 
@@ -157,8 +243,8 @@ class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
 }
 
 function generateForumListHeaders(forumListData: ForumListInfo[]) {
-  return forumListData.map((listInfo, index) => {
-    return <ListHeader key={index} listInfo={listInfo} />
+  return forumListData.map((forumListInfo, index) => {
+    return <ListWrapper key={index} forumListInfo={forumListInfo} />
   });
 }
 
