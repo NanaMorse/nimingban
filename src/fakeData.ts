@@ -1,8 +1,5 @@
 export default {
-  
   sideMenu: {
-    show: false,
-    
     forumList: [
       {
         "id": "4",

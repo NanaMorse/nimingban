@@ -1,5 +1,4 @@
 import { connect } from 'react-redux';
-import * as Actions from '../actions/index';
 
 import Header from '../components/Header';
 
@@ -9,9 +8,7 @@ function mapStateToProps() {
 
 function mapDispatchToProps(dispatch) {
   return {
-    onSideMenuToggled: () => {
-      dispatch(Actions.toggleSideMenu());
-    }
+
   }
 }
 

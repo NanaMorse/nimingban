@@ -1,14 +1,43 @@
 import * as React from "react";
-import { View, Animated, StyleSheet, Dimensions, ScrollView, Text, TouchableHighlight } from 'react-native';
+import {
+  View,
+  PanResponder,
+  Animated,
+  StyleSheet,
+  Dimensions,
+  ScrollView,
+  Text,
+  TouchableHighlight,
+  TouchableWithoutFeedback
+} from 'react-native';
 import * as DefaultStyles from '../constants/defaultStyles';
 
 
 import ViewStyle = __React.ViewStyle;
 import TextStyle = __React.TextStyle;
 
+// constants start
 const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
 
+const barrierForward = windowWidth / 4;
+
 const defaultMenuWidth = windowWidth - 80;
+
+const animateDuration = 500;
+
+const toleranceX = 10;
+const toleranceY = 10;
+
+const edgeHitWidth = 60;
+// constants end
+
+const absoluteStretch = {
+  position: 'absolute',
+  top: 50,
+  left: 0,
+  bottom: 0,
+  right: 0,
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -18,6 +47,10 @@ const styles = StyleSheet.create({
   appView: {
     flex: 1,
     width: windowWidth
+  } as ViewStyle,
+
+  overlay: {
+    backgroundColor: 'transparent'
   } as ViewStyle,
 
   sideMenu: {
@@ -46,7 +79,7 @@ const styles = StyleSheet.create({
 
   listHeader: {
     flexDirection: 'row',
-    width: defaultMenuWidth,
+    width: windowWidth,
     height: 40,
     padding: 10,
     paddingLeft: 15,
@@ -130,7 +163,7 @@ class ListWrapper extends React.Component<ListWrapperProps, ListWrapperState> {
     const toValue = toShow ? this.props.forumListInfo.forums.length * 40 : 0;
     Animated.timing(this.state.dropDownAnimate, {
       toValue,
-      duration: 250
+      duration: animateDuration
     } as any).start()
   }
 
@@ -166,8 +199,6 @@ class ListWrapper extends React.Component<ListWrapperProps, ListWrapperState> {
   }
 }
 
-
-
 const SubListWrapper = (props) => {
 
   const listItems = props.forums.map((forumInfo, index) => {
@@ -190,62 +221,141 @@ const SubListWrapper = (props) => {
 
 interface SideMenuProps {
   show: boolean;
-  forumList: ForumListInfo[]
+  forumList: ForumListInfo[];
+  onChange: Function;
 }
 
 interface SideMenuState {
-  slideAnimate: any;
+  slideAnimate?: any;
+  prevLeft?: number;
+  responder?: any;
 }
 
 
 class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
-  constructor() {
+  constructor(props) {
     super();
 
-    this.state = {} as SideMenuState;
+    this.state = {
+      prevLeft: props.show ? defaultMenuWidth : 0,
+      slideAnimate: new Animated.Value(props.show ? defaultMenuWidth : 0)
+    };
   }
-  
+
   componentWillMount() {
-    this.state.slideAnimate = new Animated.Value(this.props.show ? defaultMenuWidth : 0);
+    this.state.responder = PanResponder.create({
+      onStartShouldSetResponderCapture: this.onStartShouldSetResponderCapture.bind(this),
+      onMoveShouldSetPanResponder: this.onMoveShouldSetPanResponder.bind(this),
+      onPanResponderMove: this.onPanResponderMove.bind(this),
+      onPanResponderRelease: this.onPanResponderRelease.bind(this)
+    } as any);
   }
 
   componentWillReceiveProps(props: SideMenuProps) {
-    const toValue = props.show ? defaultMenuWidth : 0;
+    this.openSideMenu(props.show);
+  }
+
+  // pan event start
+  onStartShouldSetResponderCapture() {
+    return true;
+  }
+
+  onMoveShouldSetPanResponder(e, gestureState) {
+    const x = Math.round(Math.abs(gestureState.dx));
+    const y = Math.round(Math.abs(gestureState.dy));
+
+    const touchMoved = x > toleranceX && y < toleranceY;
+
+    if (this.props.show) {
+      return touchMoved;
+    }
+
+    // swipe in right area
+    const withinEdgeHitWidth = gestureState.moveX < edgeHitWidth;
+
+    // swipe to right direction
+    const swipingToOpen = gestureState.dx > 0;
+
+    return touchMoved && withinEdgeHitWidth && swipingToOpen;
+  }
+
+  onPanResponderMove(e, gestureState) {
+    if (this.state.slideAnimate.__getValue() >= 0) {
+      let newLeft = this.state.prevLeft + gestureState.dx;
+      // fix for appView's margin left
+      if (newLeft < 0) newLeft = 0;
+      this.state.slideAnimate.setValue(newLeft);
+    }
+  }
+
+  onPanResponderRelease(e, gestureState) {
+    const offsetLeft = this.state.slideAnimate.__getValue() + gestureState.dx;
     
+    this.openSideMenu(shouldOpenMenu(offsetLeft));
+  }
+  // pan event end
+  
+  openSideMenu(isOpen) {
+
+    const newOffSet = isOpen ? defaultMenuWidth : 0;
+
     Animated.timing(this.state.slideAnimate, {
-      toValue,
-      duration: 250
-    } as any).start()
+      toValue: newOffSet,
+      duration: animateDuration,
+    }).start();
+
+    this.state.prevLeft = newOffSet;
+    this.forceUpdate();
+    this.props.onChange(isOpen);
+  }
+
+  wrapperTouchContentView() {
+    let overlay = null;
+    if (this.props.show) {
+      overlay = (
+        <TouchableWithoutFeedback onPress={() => this.openSideMenu(false)}>
+          <View style={[styles.overlay, absoluteStretch]} />
+        </TouchableWithoutFeedback>
+      );
+    }
+
+    const style = [styles.appView, {marginLeft: this.state.slideAnimate}];
+
+    return (
+      <Animated.View style={style} {...this.state.responder.panHandlers}>
+        {this.props.children}
+        {overlay}
+      </Animated.View>
+    );
   }
 
   render() {
-
     const forumList = this.props.forumList;
-
     
     const sideMenuStyle = [styles.sideMenu, {width: this.state.slideAnimate}];
-    const appViewStyle = [styles.appView, {marginLeft: this.state.slideAnimate}];
-    
+
     return (
       <View style={styles.container}>
         <Animated.View style={sideMenuStyle}>
           <SideMenuHeader />
           <ScrollView>
-            {generateForumListHeaders(forumList)}
+            {generateForumListWrappers(forumList)}
           </ScrollView>
         </Animated.View>
-        <Animated.View style={appViewStyle}>
-          {this.props.children}
-        </Animated.View>
+        {this.wrapperTouchContentView()}
       </View>
     );
   }
 }
 
-function generateForumListHeaders(forumListData: ForumListInfo[]) {
+function generateForumListWrappers(forumListData: ForumListInfo[]) {
   return forumListData.map((forumListInfo, index) => {
     return <ListWrapper key={index} forumListInfo={forumListInfo} />
   });
+}
+
+function shouldOpenMenu(dx: Number) {
+  return dx > barrierForward;
 }
 
 export default SideMenu;

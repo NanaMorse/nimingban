@@ -36,7 +36,13 @@ export default class extends React.Component<Props, State> {
   render() {
     
     const sideMenuProps = {
-      show: this.state.showSideMenu
+      show: this.state.showSideMenu,
+      onChange: (show) => {
+        if (show === this.state.showSideMenu) return;
+        this.setState({
+          showSideMenu: show
+        })
+      }
     };
     
     const headerProps = {
