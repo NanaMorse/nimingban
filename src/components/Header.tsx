@@ -1,12 +1,15 @@
 import * as React from "react";
-import { View, Text, TouchableHighlight, StyleSheet } from 'react-native';
+import { View, Text, TouchableHighlight, StyleSheet, Dimensions } from 'react-native';
 import * as DefaultStyles from '../constants/defaultStyles';
+
+const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
 
 import ViewStyle = __React.ViewStyle;
 import TextStyle = __React.TextStyle;
 
 const styles = StyleSheet.create({
   header: {
+    width: windowWidth,
     backgroundColor: 'steelblue',
     flexDirection: 'row',
     justifyContent: 'space-between',
