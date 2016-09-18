@@ -1,7 +1,7 @@
 export default {
   sideMenu: {
     isFetching: false,
-    lastUpdate: '',
+    receiveAt: '',
     forumList: [
       {
         "id": "4",

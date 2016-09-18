@@ -9,7 +9,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     tryRequestForumList: function () {
-      dispatch(Actions.tryRequestForumList());
+      return dispatch(Actions.tryRequestForumList());
     }
   }
 }

@@ -239,6 +239,7 @@ interface SideMenuState {
   slideAnimate?: any;
   prevLeft?: number;
   responder?: any;
+  refreshing?: boolean;
 }
 
 class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
@@ -246,6 +247,7 @@ class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
     super();
 
     this.state = {
+      refreshing: false,
       prevLeft: props.show ? defaultMenuWidth : 0,
       slideAnimate: new Animated.Value(props.show ? defaultMenuWidth : 0)
     };
@@ -258,6 +260,11 @@ class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
       onPanResponderMove: this.onPanResponderMove.bind(this),
       onPanResponderRelease: this.onPanResponderRelease.bind(this)
     } as any);
+  }
+
+  componentDidMount() {
+    // refresh forumList every time when application mounted
+    this.props.tryRequestForumList();
   }
 
   componentWillReceiveProps(props: SideMenuProps) {
@@ -322,12 +329,6 @@ class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
     this.openSideMenu(false, subForumInfo);
   }
 
-  onRefreshControl() {
-    return (
-      <RefreshControl onRefresh={() => this.props.tryRequestForumList()}/>
-    );
-  }
-
   wrapperTouchContentView() {
     let overlay = null;
     if (this.props.show) {
@@ -357,7 +358,7 @@ class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
       <View style={styles.container}>
         <Animated.View style={sideMenuStyle}>
           <SideMenuHeader />
-          <ScrollView refreshControl={this.onRefreshControl()}>
+          <ScrollView>
             {generateForumListWrappers(forumList, this.onSubForumSelected.bind(this))}
           </ScrollView>
         </Animated.View>

@@ -20,12 +20,10 @@ export function tryRequestForumList() {
   // todo check lastFetchDate
   return function (dispatch, getState) {
     dispatch(requestForumList());
-
-    fetch(Api.API_GET_FORUM_LIST)
+    return fetch(Api.API_GET_FORUM_LIST)
       .then(response => response.json())
       .then(forumList => {
-        receiveForumList(forumList);
-        console.log(forumList);
+        dispatch(receiveForumList(forumList));
       });
   }
 }
