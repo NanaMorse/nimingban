@@ -2,6 +2,7 @@ import * as React from "react";
 import { View, Text, TouchableHighlight, StyleSheet, Dimensions, ListView } from 'react-native';
 import ListViewDataSource = __React.ListViewDataSource;
 import ScrollViewStyle = __React.ScrollViewStyle;
+import ViewStyle = __React.ViewStyle;
 
 const articleList = [
   {
@@ -1248,6 +1249,17 @@ const styles = StyleSheet.create({
     shadowColor: 'rgba(32, 40, 49, 0.1)',
     shadowOffset: {width: 0, height: 5},
     shadowOpacity: 1
+  },
+
+  rowInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10
+  } as ViewStyle,
+
+  rowInfoText: {
+    color: '#94999e',
+    fontSize: 12
   }
 });
 
@@ -1273,6 +1285,10 @@ class Article extends React.Component<articleProps, articleState> {
     return (
       <TouchableHighlight>
         <View style={styles.postRow}>
+          <View style={styles.rowInfo}>
+            <Text style={styles.rowInfoText}>{`${postData.userid} ${postData.now}`}</Text>
+            <Text style={styles.rowInfoText}>{`reply：${postData.replyCount}`}</Text>
+          </View>
           <Text>{postData.content}</Text>
         </View>
       </TouchableHighlight>
