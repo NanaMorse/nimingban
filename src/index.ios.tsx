@@ -1,5 +1,5 @@
 import * as React from "react";
-import { View } from 'react-native';
+import { View, NavigatorIOS } from 'react-native';
 import { Provider } from 'react-redux';
 
 import Article from './components/Article';
@@ -52,18 +52,23 @@ export default class extends React.Component<Props, State> {
         }
       }
     };
-    
-    const headerProps = {
-      content: this.state.headerContent,
-      onSideMenuToggled: () => this.onSideMenuToggled()
+
+    const navigatorProps = {
+      style: { flex: 1 },
+      initialRoute: {
+        title: this.state.headerContent,
+        component: Article
+      }
     };
     
+
     return (
+
+      // todo change navigator's header after forum selected
       <Provider store = { store }>
         <SideMenuContainer {...sideMenuProps}>
           <View style={{flex: 1}}>
-            <HeaderContainer {...headerProps}/>
-            <Article />
+            <NavigatorIOS {...navigatorProps}/>
           </View>
         </SideMenuContainer>
       </Provider>

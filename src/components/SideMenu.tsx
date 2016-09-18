@@ -11,7 +11,6 @@ import {
   TouchableWithoutFeedback,
   RefreshControl
 } from 'react-native';
-import * as DefaultStyles from '../constants/defaultStyles';
 
 
 import ViewStyle = __React.ViewStyle;
@@ -62,6 +61,9 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   
   sideMenuHeader: {
+    height: 64,
+    padding: 10,
+    paddingTop: 20,
     paddingLeft: 15,
     backgroundColor: '#404040',
     justifyContent: 'flex-start',
@@ -70,6 +72,7 @@ const styles = StyleSheet.create({
   } as ViewStyle,
 
   sideMenuHeaderText: {
+    marginTop: 15,
     color: '#ccc'
   } as TextStyle,
 
@@ -120,7 +123,7 @@ const styles = StyleSheet.create({
 
 const SideMenuHeader = () => {
   return (
-    <View style={[DefaultStyles.HEADER, styles.sideMenuHeader]}>
+    <View style={styles.sideMenuHeader}>
       <Text style={styles.sideMenuHeaderText}>板块列表</Text>
     </View>
   );

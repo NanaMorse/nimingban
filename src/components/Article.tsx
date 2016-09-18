@@ -1297,6 +1297,8 @@ class Article extends React.Component<articleProps, articleState> {
 
   render() {
 
+    console.log('render article');
+
     const listViewProps = {
       dataSource: this.state.dataSource,
       renderRow: this.renderPostData.bind(this)

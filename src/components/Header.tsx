@@ -1,6 +1,5 @@
 import * as React from "react";
 import { View, Text, TouchableHighlight, StyleSheet, Dimensions } from 'react-native';
-import * as DefaultStyles from '../constants/defaultStyles';
 
 const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
 
@@ -70,7 +69,7 @@ class Header extends React.Component<Props, State> {
     ];
 
     return (
-      <View style={[DefaultStyles.HEADER, styles.header]} >
+      <View style={[styles.header]} >
         <TouchableHighlight onPress={() => this.onSlideMenuToggled()}>
           <View style={[styles.headerBtn, styles.slideMenuToggleBtn]}/>
         </TouchableHighlight>
