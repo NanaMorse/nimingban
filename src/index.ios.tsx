@@ -2,6 +2,8 @@ import * as React from "react";
 import { View } from 'react-native';
 import { Provider } from 'react-redux';
 
+import Article from './components/Article';
+
 import SideMenuContainer from './containers/SideMenuContainer';
 import HeaderContainer from './containers/HeaderContainer';
 
@@ -61,6 +63,7 @@ export default class extends React.Component<Props, State> {
         <SideMenuContainer {...sideMenuProps}>
           <View style={{flex: 1}}>
             <HeaderContainer {...headerProps}/>
+            <Article />
           </View>
         </SideMenuContainer>
       </Provider>
