@@ -1,7 +1,9 @@
 import * as React from "react";
-import { View } from 'react-native';
 import { Provider } from 'react-redux';
 import Drawer from 'react-native-drawer'
+import { Router, Scene } from 'react-native-router-flux';
+const events = require('RCTDeviceEventEmitter');
+import * as EventTags from './constants/eventTags';
 
 import Article from './components/Article';
 
@@ -14,19 +16,27 @@ interface Props {
 }
 
 interface State {
-  showSideMenu?: boolean
-  
-  headerContent?: string
+  headerContent?: string;
+  drawerRef?: any;
 }
 
-export default class extends React.Component<Props, State> {
+class App extends React.Component<Props, State> {
   constructor() {
     super();
     
     this.state = {
-      showSideMenu: false,
       headerContent: 'nimingban'
     }
+  }
+
+  componentDidMount() {
+    events.addListener(EventTags.TOGGLE_DRAWER_DISPLAY, () => {
+      this.toggleDrawer();
+    });
+  }
+
+  toggleDrawer() {
+    this.state.drawerRef.toggle();
   }
 
   render() {
@@ -34,17 +44,22 @@ export default class extends React.Component<Props, State> {
       openDrawerOffset: 100,
       panOpenMask: 60,
       captureGestures: true,
-      content: <SideMenuContainer/>
+      content: <SideMenuContainer/>,
+      ref: (ref) => this.state.drawerRef = ref
     };
-
+    
     return (
       <Provider store = { store }>
         <Drawer { ...drawerProps }>
-          <View style = {{ flex: 1 }}>
-            <Article />
-          </View>
+          <Router>
+            <Scene key="root">
+              <Scene key="main" component={Article} title={this.state.headerContent} initial={true} />
+            </Scene>
+          </Router>
         </Drawer>
       </Provider>
     );
   }
 }
+
+export default App;

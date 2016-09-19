@@ -1297,7 +1297,7 @@ class Article extends React.Component<articleProps, articleState> {
 
   render() {
 
-    console.log('render article');
+    console.log(this.props);
 
     const listViewProps = {
       dataSource: this.state.dataSource,
@@ -1305,8 +1305,9 @@ class Article extends React.Component<articleProps, articleState> {
     };
 
     return (
-      <ListView style={styles.listView} {...listViewProps}>
-      </ListView>
+      <View style = {{ flex: 1, marginTop: 64 }}>
+        <ListView style={styles.listView} {...listViewProps}></ListView>
+      </View>
     );
   }
 }

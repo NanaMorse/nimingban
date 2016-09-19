@@ -9,6 +9,9 @@ import {
   TouchableHighlight
 } from 'react-native';
 
+const events = require('RCTDeviceEventEmitter');
+import * as EventTags from '../constants/eventTags';
+
 import ViewStyle = __React.ViewStyle;
 import TextStyle = __React.TextStyle;
 
@@ -69,7 +72,7 @@ const styles = StyleSheet.create({
 
   subListAnimateWrapper: {
     flex: 1,
-    width: defaultMenuWidth,
+    width: windowWidth,
     height: 20,
     overflow: 'hidden'
   } as ViewStyle,
@@ -114,7 +117,7 @@ const SubListWrapper = (props) => {
   const listItems = props.forums.map((forumInfo, index) => {
 
     const onPress = () => {
-      props.onSubForumSelected(forumInfo);
+      events.emit(EventTags.TOGGLE_DRAWER_DISPLAY);
     };
 
     return (
