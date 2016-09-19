@@ -42,10 +42,28 @@ class App extends React.Component<Props, State> {
   render() {
     const drawerProps = {
       openDrawerOffset: 100,
-      panOpenMask: 60,
       captureGestures: true,
+      panOpenMask: 20,
+      panCloseMask:0.2,
       content: <SideMenuContainer/>,
-      ref: (ref) => this.state.drawerRef = ref
+      ref: (ref) => this.state.drawerRef = ref,
+      styles: {
+        mainOverlay: {
+          top: 64
+        }
+      }
+    };
+
+    const mainSceneProps = {
+      key: 'main',
+      component: Article,
+      title: this.state.headerContent,
+      initial: true,
+      drawerImage: require('../images/menu-icon.png'),
+      leftButtonIconStyle: {
+        width: 21,
+        height: 24
+      }
     };
     
     return (
@@ -53,7 +71,7 @@ class App extends React.Component<Props, State> {
         <Drawer { ...drawerProps }>
           <Router>
             <Scene key="root">
-              <Scene key="main" component={Article} title={this.state.headerContent} initial={true} />
+              <Scene { ...mainSceneProps }/>
             </Scene>
           </Router>
         </Drawer>
