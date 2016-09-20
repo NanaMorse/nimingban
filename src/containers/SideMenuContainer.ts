@@ -8,6 +8,11 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
+    
+    checkoutForumList: function (forumInfo) {
+      return dispatch(Actions.checkoutForum(forumInfo));
+    },
+    
     tryRequestForumList: function () {
       return dispatch(Actions.tryRequestForumList());
     }

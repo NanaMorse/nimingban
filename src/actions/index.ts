@@ -16,8 +16,6 @@ function receiveForumList(forumList) {
 }
 
 export function tryRequestForumList() {
-
-  // todo check lastFetchDate
   return function (dispatch, getState) {
     dispatch(requestForumList());
     return fetch(Api.API_GET_FORUM_LIST)
@@ -25,5 +23,27 @@ export function tryRequestForumList() {
       .then(forumList => {
         dispatch(receiveForumList(forumList));
       });
+  }
+}
+
+export function checkoutForum(forumInfo) {
+  return {
+    type: Types.CHECK_OUT_FORUM,
+    forumId: forumInfo.id,
+    forumName: forumInfo.name
+  }
+}
+
+function requestArticleList() {
+  return {
+    type: Types.REQUEST_ARTICLE_LIST
+  }
+}
+
+function receiveArticleList(articleList) {
+  return {
+    type: Types.RECEIVE_ARTICLE_LIST,
+    articleList,
+    receiveAt: Date.now()
   }
 }

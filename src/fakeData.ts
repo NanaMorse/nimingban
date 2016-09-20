@@ -750,5 +750,18 @@ export default {
         }]
       }
     ]
+  },
+  
+  article: {
+    isFetching: false,
+
+    receiveAt: '',
+
+    forumInfo: {
+      id: 4,
+      name: "综合版1"
+    },
+
+    articleList: []
   }
 }

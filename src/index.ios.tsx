@@ -5,7 +5,7 @@ import { Router, Scene } from 'react-native-router-flux';
 const events = require('RCTDeviceEventEmitter');
 import * as EventTags from './constants/eventTags';
 
-import Article from './components/Article';
+import ArticleContainer from './containers/ArticleContainer';
 
 import SideMenuContainer from './containers/SideMenuContainer';
 
@@ -54,10 +54,10 @@ class App extends React.Component<Props, State> {
       }
     };
 
-    const mainSceneProps = {
-      key: 'main',
-      component: Article,
-      title: this.state.headerContent,
+    const articleSceneProps = {
+      key: 'article',
+      component: ArticleContainer,
+      title: (store.getState() as any).article.forumInfo.name,
       initial: true,
       drawerImage: require('../images/menu-icon.png'),
       leftButtonIconStyle: {
@@ -71,7 +71,7 @@ class App extends React.Component<Props, State> {
         <Drawer { ...drawerProps }>
           <Router>
             <Scene key="root">
-              <Scene { ...mainSceneProps }/>
+              <Scene { ...articleSceneProps }/>
             </Scene>
           </Router>
         </Drawer>

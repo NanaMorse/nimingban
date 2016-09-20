@@ -112,12 +112,15 @@ interface ForumListInfo {
   name: string;
 }
 
+let onCheckoutDispatch;
+
 const SubListWrapper = (props) => {
 
   const listItems = props.forums.map((forumInfo, index) => {
 
     const onPress = () => {
       events.emit(EventTags.TOGGLE_DRAWER_DISPLAY);
+      onCheckoutDispatch(forumInfo)
     };
 
     return (
@@ -168,7 +171,7 @@ class ListWrapper extends React.Component<ListWrapperProps, ListWrapperState> {
     Animated.timing(this.state.dropDownAnimate, {
       toValue,
       duration: animateDuration
-    } as any).start()
+    } as any).start();
   }
 
   render() {
@@ -206,26 +209,24 @@ class ListWrapper extends React.Component<ListWrapperProps, ListWrapperState> {
 interface SideMenuProps {
   show: boolean;
   forumList: ForumListInfo[];
-  onChange: Function;
   tryRequestForumList: Function;
+  checkoutForumList: Function;
 }
 
 interface SideMenuState {
-  refreshing?: boolean;
+  
 }
 
 class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
   constructor() {
     super();
-
-    this.state = {
-      refreshing: false
-    };
   }
 
   componentDidMount() {
     // refresh forumList every time when application mounted
     this.props.tryRequestForumList();
+
+    onCheckoutDispatch = this.props.checkoutForumList;
   }
 
 
