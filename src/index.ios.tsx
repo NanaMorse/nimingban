@@ -8,6 +8,7 @@ import * as EventTags from './constants/eventTags';
 import RouterContainer from './containers/RouterContainer';
 import SideMenuContainer from './containers/SideMenuContainer';
 import ArticleContainer from './containers/ArticleContainer';
+import Post from './components/Post';
 
 import store from './store';
 
@@ -66,12 +67,18 @@ class App extends React.Component<Props, State> {
       }
     };
     
+    const postSceneProps = {
+      key: 'post',
+      component: Post
+    };
+    
     return (
       <Provider store = { store }>
         <Drawer { ...drawerProps }>
           <RouterContainer>
             <Scene key="root">
               <Scene { ...articleSceneProps }/>
+              <Scene { ...postSceneProps }/>
             </Scene>
           </RouterContainer>
         </Drawer>

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { View, Text, TouchableHighlight, StyleSheet, Dimensions, ListView } from 'react-native';
+import { View, Text, TouchableHighlight, StyleSheet, ListView } from 'react-native';
 import { Actions } from 'react-native-router-flux'
 
 import ListViewDataSource = __React.ListViewDataSource;
@@ -20,10 +20,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderColor: '#e8e9ea',
     borderWidth: 1,
-    borderRadius: 3,
-    shadowColor: 'rgba(32, 40, 49, 0.1)',
-    shadowOffset: {width: 0, height: 5},
-    shadowOpacity: 1
+    borderRadius: 3
   },
 
   postRowInfo: {
@@ -76,9 +73,13 @@ class Article extends React.Component<articleProps, articleState> {
     return !beforeRefresh;
   }
 
+  onViewPost(postData) {
+    (Actions as any).post({postData});
+  }
+
   renderPostData(postData) {
     return (
-      <TouchableHighlight>
+      <TouchableHighlight onPress={() => this.onViewPost(postData)}>
         <View style={styles.postRow}>
           <View style={styles.postRowInfo}>
             <Text style={styles.rowInfoText}>{`${postData.userid} ${postData.now}`}</Text>
@@ -91,8 +92,6 @@ class Article extends React.Component<articleProps, articleState> {
   }
 
   render() {
-
-    console.log('re render!', this.props);
 
     const listViewProps = {
       dataSource: this.state.dataSource,
