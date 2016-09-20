@@ -5,9 +5,9 @@ import { Router, Scene } from 'react-native-router-flux';
 const events = require('RCTDeviceEventEmitter');
 import * as EventTags from './constants/eventTags';
 
-import ArticleContainer from './containers/ArticleContainer';
-
+import RouterContainer from './containers/RouterContainer';
 import SideMenuContainer from './containers/SideMenuContainer';
+import ArticleContainer from './containers/ArticleContainer';
 
 import store from './store';
 
@@ -69,11 +69,11 @@ class App extends React.Component<Props, State> {
     return (
       <Provider store = { store }>
         <Drawer { ...drawerProps }>
-          <Router>
+          <RouterContainer>
             <Scene key="root">
               <Scene { ...articleSceneProps }/>
             </Scene>
-          </Router>
+          </RouterContainer>
         </Drawer>
       </Provider>
     );
