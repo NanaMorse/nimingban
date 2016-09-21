@@ -9,16 +9,11 @@ import {
   TouchableHighlight
 } from 'react-native';
 
-const events = require('RCTDeviceEventEmitter');
-import * as EventTags from '../constants/eventTags';
-
 import ViewStyle = __React.ViewStyle;
 import TextStyle = __React.TextStyle;
 
 // constants start
 const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
-
-const defaultMenuWidth = 100;
 
 const animateDuration = 500;
 
@@ -119,7 +114,6 @@ const SubListWrapper = (props) => {
   const listItems = props.forums.map((forumInfo, index) => {
 
     const onPress = () => {
-      events.emit(EventTags.TOGGLE_DRAWER_DISPLAY);
       onCheckoutDispatch(forumInfo)
     };
 

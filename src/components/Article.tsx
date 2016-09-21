@@ -74,7 +74,10 @@ class Article extends React.Component<articleProps, articleState> {
   }
 
   onViewPost(postData) {
-    (Actions as any).post({postData});
+    (Actions as any).post({
+      postData,
+      title: postData.id
+    });
   }
 
   renderPostData(postData) {
@@ -92,7 +95,7 @@ class Article extends React.Component<articleProps, articleState> {
   }
 
   render() {
-
+    
     const listViewProps = {
       dataSource: this.state.dataSource,
       renderRow: this.renderPostData.bind(this)
