@@ -9,18 +9,17 @@ import ViewStyle = __React.ViewStyle;
 const styles = StyleSheet.create({
   listView: {
     backgroundColor: '#f2f2f2',
-    paddingTop: 5
   },
 
   postRow: {
+    padding: 5,
+  },
+
+  postRowPress: {
     backgroundColor: '#fff',
-    marginBottom: 10,
-    marginLeft: 5,
-    marginRight: 5,
-    padding: 10,
     borderColor: '#e8e9ea',
     borderWidth: 1,
-    borderRadius: 3
+    padding: 10
   },
 
   postRowInfo: {
@@ -36,13 +35,13 @@ const styles = StyleSheet.create({
 });
 
 interface articleProps {
-  articleList: any[];
-  forumInfo: any;
-  title: string
+  articleList:any[];
+  forumInfo:any;
+  title:string
 }
 
 interface articleState {
-  dataSource: ListViewDataSource
+  dataSource:ListViewDataSource
 }
 
 class Article extends React.Component<articleProps, articleState> {
@@ -82,27 +81,29 @@ class Article extends React.Component<articleProps, articleState> {
 
   renderPostData(postData) {
     return (
-      <TouchableHighlight onPress={() => this.onViewPost(postData)}>
-        <View style={styles.postRow}>
-          <View style={styles.postRowInfo}>
-            <Text style={styles.rowInfoText}>{`${postData.userid} ${postData.now}`}</Text>
-            <Text style={styles.rowInfoText}>{`reply：${postData.replyCount}`}</Text>
+      <View style={styles.postRow}>
+        <TouchableHighlight onPress={() => this.onViewPost(postData)}>
+          <View style={styles.postRowPress}>
+            <View style={styles.postRowInfo}>
+              <Text style={styles.rowInfoText}>{`${postData.userid} ${postData.now}`}</Text>
+              <Text style={styles.rowInfoText}>{`reply：${postData.replyCount}`}</Text>
+            </View>
+            <Text>{postData.content}</Text>
           </View>
-          <Text>{postData.content}</Text>
-        </View>
-      </TouchableHighlight>
+        </TouchableHighlight>
+      </View>
     );
   }
 
   render() {
-    
+
     const listViewProps = {
       dataSource: this.state.dataSource,
       renderRow: this.renderPostData.bind(this)
     };
 
     return (
-      <View style = {{ flex: 1, marginTop: 64 }}>
+      <View style={{ flex: 1, marginTop: 64 }}>
         <ListView style={styles.listView} {...listViewProps}></ListView>
       </View>
     );

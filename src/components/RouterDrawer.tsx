@@ -20,7 +20,7 @@ class RouterDrawer extends React.Component<Props, any> {
       open: this.props.open,
       openDrawerOffset: 100,
       captureGestures: true,
-      panOpenMask: 20,
+      panOpenMask: 10,
       panCloseMask:0.2,
       content: <SideMenuContainer />,
       styles: {
