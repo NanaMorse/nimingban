@@ -8,6 +8,7 @@ import {
   Text,
   TouchableHighlight
 } from 'react-native';
+import { Actions } from 'react-native-router-flux'; 
 
 import ViewStyle = __React.ViewStyle;
 import TextStyle = __React.TextStyle;
@@ -114,7 +115,8 @@ const SubListWrapper = (props) => {
   const listItems = props.forums.map((forumInfo, index) => {
 
     const onPress = () => {
-      onCheckoutDispatch(forumInfo)
+      Actions.refresh({key: 'drawer', open: false});
+      onCheckoutDispatch(forumInfo);
     };
 
     return (

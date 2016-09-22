@@ -2,6 +2,8 @@ import * as React from "react";
 import SideMenuContainer from '../containers/SideMenuContainer';
 import Drawer from 'react-native-drawer'
 import { DefaultRenderer } from 'react-native-router-flux';
+const events = require('RCTDeviceEventEmitter');
+import { DRAWER_CLOSED } from '../constants/eventTags';
 
 interface Props {
   navigationState: any;
@@ -23,6 +25,7 @@ class RouterDrawer extends React.Component<Props, any> {
       panOpenMask: 10,
       panCloseMask:0.2,
       content: <SideMenuContainer />,
+      onClose: () => events.emit(DRAWER_CLOSED),
       styles: {
         mainOverlay: {
           top: 64

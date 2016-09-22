@@ -16,7 +16,7 @@ function receiveForumList(forumList) {
 }
 
 export function tryRequestForumList() {
-  return function (dispatch, getState) {
+  return function (dispatch) {
     dispatch(requestForumList());
     return fetch(Api.API_GET_FORUM_LIST())
       .then(response => response.json())

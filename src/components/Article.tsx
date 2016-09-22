@@ -1,6 +1,8 @@
 import * as React from "react";
-import { View, Text, TouchableHighlight, RefreshControl, StyleSheet, ListView } from 'react-native';
-import { Actions } from 'react-native-router-flux'
+import { View, Text, TouchableHighlight, RefreshControl, StyleSheet, ListView, setTimeout } from 'react-native';
+import { Actions } from 'react-native-router-flux';
+const events = require('RCTDeviceEventEmitter');
+import { DRAWER_CLOSED } from '../constants/eventTags';
 
 import ListViewDataSource = __React.ListViewDataSource;
 import ScrollViewStyle = __React.ScrollViewStyle;
@@ -64,9 +66,14 @@ class Article extends React.Component<articleProps, articleState> {
   componentWillReceiveProps(props) {
     if (this.shouldActionRefresh(props)) {
       Actions.refresh({title: props.forumInfo.name});
-      this.props.tryRequestArticleList(props.forumInfo.id)
-        .then(() => this.state._listView_ref.scrollTo({ y: 0 }));
+      
+      events.addListener(DRAWER_CLOSED, () => {
+        this.props.tryRequestArticleList(props.forumInfo.id)
+          .then(() => this.state._listView_ref.scrollTo({ y: 0 }));
+        events.removeAllListeners(DRAWER_CLOSED);
+      });
     }
+    
   }
 
   shouldComponentUpdate(props) {
@@ -115,6 +122,8 @@ class Article extends React.Component<articleProps, articleState> {
   }
 
   render() {
+    
+    console.log('render article');
 
     const listViewProps = {
       dataSource: this.state.dataSource.cloneWithRows(this.props.articleList),
