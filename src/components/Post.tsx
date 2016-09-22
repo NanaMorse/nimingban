@@ -1,6 +1,9 @@
 import * as React from "react";
 import { View, Text, TouchableHighlight, StyleSheet, ListView } from 'react-native';
+import { API_GET_REPLY_LIST } from '../constants/api'
+
 import ViewStyle = __React.ViewStyle;
+import { postData, replyData } from '../interface';
 
 const styles = StyleSheet.create({
   listView: {
@@ -28,29 +31,46 @@ const styles = StyleSheet.create({
   }
 });
 
-class Post extends React.Component<any, any> {
+interface postProps {
+  postData: postData;
+}
+
+interface postState {
+  replyDataSource?: any;
+  onRequest?: boolean;
+  onNetError?: boolean;
+  replys?: replyData[]
+}
+
+class Post extends React.Component<postProps, postState> {
   constructor(props) {
     super();
-
-    const postData = props.postData;
-    const mainContent = {
-      admin: postData.admin,
-      content: postData.content,
-      email: postData.email,
-      id: postData.id,
-      name: postData.name,
-      now: postData.now,
-      userid: postData.userid
-    };
-
-    const replyDataSource = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-    
-    console.log(props.postData.replys);
     
     this.state = {
-      replyDataSource: replyDataSource.cloneWithRows([mainContent, ...props.postData.replys]),
+      replyDataSource: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
+      onRequest: false,
+      onNetError: false,
+      replys: []
     };
+    
   }
+  
+  componentDidMount() {
+    this.tryRequestReplys();
+  }
+  
+  tryRequestReplys(page = 1) {
+    // will render
+    this.setState({ onRequest: true });
+    
+    fetch(API_GET_REPLY_LIST(this.props.postData.id, page))
+      .then(response => response.json())
+      .then((postData: postData) => {
+        this.setState({ replys: postData.replys })
+      })
+      .catch(error => console.log(error));
+  }
+  
 
   renderReplyData(replayData) {
     return (
@@ -65,8 +85,20 @@ class Post extends React.Component<any, any> {
   }
   
   render() {
+
+    const postData = this.props.postData;
+    const mainContent = {
+      admin: postData.admin,
+      content: postData.content,
+      email: postData.email,
+      id: postData.id,
+      name: postData.name,
+      now: postData.now,
+      userid: postData.userid
+    };
+    
     const replyViewProps = {
-      dataSource: this.state.replyDataSource,
+      dataSource: this.state.replyDataSource.cloneWithRows([mainContent, ...this.state.replys]),
       renderRow: this.renderReplyData.bind(this)
     };
 

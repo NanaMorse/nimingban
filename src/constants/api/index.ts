@@ -6,3 +6,5 @@ export const API_GET_FORUM_LIST = () => `${HOST}/Api/getForumList?${APP_ID_QUERY
 
 export const API_GET_ARTICLE_LIST = (id, page) => `${HOST}/Api/showf/?id=${id}&page=${page}&${APP_ID_QUERY}`;
 
+export const API_GET_REPLY_LIST = (id, page) => `${HOST}/Api/thread/?id=${id}&page=${page}&${APP_ID_QUERY}`;
+
