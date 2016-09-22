@@ -37,7 +37,8 @@ const styles = StyleSheet.create({
 interface articleProps {
   articleList:any[];
   forumInfo:any;
-  title:string
+  title:string;
+  tryRequestArticleList: Function
 }
 
 interface articleState {
@@ -45,18 +46,22 @@ interface articleState {
 }
 
 class Article extends React.Component<articleProps, articleState> {
-  constructor(props) {
+  constructor() {
     super();
 
-    const dataSource = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
     this.state = {
-      dataSource: dataSource.cloneWithRows(props.articleList),
+      dataSource: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
     };
+  }
+
+  componentDidMount() {
+    this.props.tryRequestArticleList(this.props.forumInfo.id, 1);
   }
 
   componentWillReceiveProps(props) {
     if (this.shouldActionRefresh(props)) {
       Actions.refresh({title: props.forumInfo.name});
+      this.props.tryRequestArticleList(props.forumInfo.id, 1);
     }
   }
 
@@ -96,9 +101,11 @@ class Article extends React.Component<articleProps, articleState> {
   }
 
   render() {
+    
+    console.log('article render!', this.props);
 
     const listViewProps = {
-      dataSource: this.state.dataSource,
+      dataSource: this.state.dataSource.cloneWithRows(this.props.articleList),
       renderRow: this.renderPostData.bind(this)
     };
 

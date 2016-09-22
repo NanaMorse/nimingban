@@ -1,6 +1,8 @@
-export const HOST: string = 'https://h.nimingban.com';
+const HOST: string = 'https://h.nimingban.com';
 
-export const APP_ID: string = 'nimingban';
+const APP_ID_QUERY: string = 'appid=nimingban';
 
-export const API_GET_FORUM_LIST = HOST + '/Api/getForumList?appid=' + APP_ID;
+export const API_GET_FORUM_LIST = () => `${HOST}/Api/getForumList?${APP_ID_QUERY}`;
+
+export const API_GET_ARTICLE_LIST = (id, page) => `${HOST}/Api/showf/?id=${id}&page=${page}&${APP_ID_QUERY}`;
 

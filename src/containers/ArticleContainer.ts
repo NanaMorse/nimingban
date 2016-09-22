@@ -8,7 +8,9 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    
+    tryRequestArticleList: function (id, page) {
+      dispatch(Actions.tryRequestArticleList(id, page));
+    }
   }
 }
 

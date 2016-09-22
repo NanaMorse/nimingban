@@ -44,6 +44,9 @@ class Post extends React.Component<any, any> {
     };
 
     const replyDataSource = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+    
+    console.log(props.postData.replys);
+    
     this.state = {
       replyDataSource: replyDataSource.cloneWithRows([mainContent, ...props.postData.replys]),
     };

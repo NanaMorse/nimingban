@@ -18,7 +18,7 @@ function receiveForumList(forumList) {
 export function tryRequestForumList() {
   return function (dispatch, getState) {
     dispatch(requestForumList());
-    return fetch(Api.API_GET_FORUM_LIST)
+    return fetch(Api.API_GET_FORUM_LIST())
       .then(response => response.json())
       .then(forumList => {
         dispatch(receiveForumList(forumList));
@@ -45,5 +45,17 @@ function receiveArticleList(articleList) {
     type: Types.RECEIVE_ARTICLE_LIST,
     articleList,
     receiveAt: Date.now()
+  }
+}
+
+export function tryRequestArticleList(id, page) {
+  return function (dispatch) {
+    dispatch(requestArticleList());
+
+    return fetch(Api.API_GET_ARTICLE_LIST(id, page))
+      .then(response => response.json())
+      .then(articleList => {
+        dispatch(receiveArticleList(articleList));
+      });
   }
 }
