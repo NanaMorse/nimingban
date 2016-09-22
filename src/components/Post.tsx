@@ -1,5 +1,5 @@
 import * as React from "react";
-import { View, Text, TouchableHighlight, StyleSheet, ListView } from 'react-native';
+import { View, Text, TouchableHighlight, RefreshControl, StyleSheet, ListView } from 'react-native';
 import { API_GET_REPLY_LIST } from '../constants/api'
 
 import ViewStyle = __React.ViewStyle;
@@ -37,19 +37,21 @@ interface postProps {
 
 interface postState {
   replyDataSource?: any;
-  onRequest?: boolean;
-  onNetError?: boolean;
+  requesting?: boolean;
+  refreshing?: boolean;
+  getError?: boolean;
   replys?: replyData[]
 }
 
 class Post extends React.Component<postProps, postState> {
-  constructor(props) {
+  constructor() {
     super();
     
     this.state = {
       replyDataSource: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
-      onRequest: false,
-      onNetError: false,
+      requesting: false,
+      refreshing: false,
+      getError: false,
       replys: []
     };
     
@@ -61,7 +63,7 @@ class Post extends React.Component<postProps, postState> {
   
   tryRequestReplys(page = 1) {
     // will render
-    this.setState({ onRequest: true });
+    this.setState({ requesting: true });
     
     fetch(API_GET_REPLY_LIST(this.props.postData.id, page))
       .then(response => response.json())
@@ -70,14 +72,18 @@ class Post extends React.Component<postProps, postState> {
       })
       .catch(error => console.log(error));
   }
+
+  generateRefreshControl() {
+    return <RefreshControl refreshing={this.state.refreshing} onRefresh={this.tryRequestReplys.bind(this)}/>
+  }
   
 
-  renderReplyData(replayData) {
+  renderReplyData(replayData: replyData) {
     return (
       <View style={styles.contentRow}>
         <View style={styles.contentRowInfo}>
           <Text style={styles.rowInfoText}>{`${replayData.userid} ${replayData.now}`}</Text>
-          <Text style={styles.rowInfoText}>{`No：${replayData.userid}`}</Text>
+          <Text style={styles.rowInfoText}>{`No：${replayData.id}`}</Text>
         </View>
         <Text>{replayData.content}</Text>
       </View>
@@ -85,7 +91,7 @@ class Post extends React.Component<postProps, postState> {
   }
   
   render() {
-
+    
     const postData = this.props.postData;
     const mainContent = {
       admin: postData.admin,
@@ -99,12 +105,14 @@ class Post extends React.Component<postProps, postState> {
     
     const replyViewProps = {
       dataSource: this.state.replyDataSource.cloneWithRows([mainContent, ...this.state.replys]),
-      renderRow: this.renderReplyData.bind(this)
+      renderRow: this.renderReplyData.bind(this),
+      refreshControl: this.generateRefreshControl(),
+      style: styles.listView
     };
 
     return (
       <View style={{ flex: 1, marginTop: 64 }}>
-        <ListView style={styles.listView} { ...replyViewProps }></ListView>
+        <ListView { ...replyViewProps }></ListView>
       </View>
     )
   }

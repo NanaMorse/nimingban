@@ -48,7 +48,7 @@ function receiveArticleList(articleList) {
   }
 }
 
-export function tryRequestArticleList(id, page) {
+export function tryRequestArticleList(id, page = 1) {
   return function (dispatch) {
     dispatch(requestArticleList());
 

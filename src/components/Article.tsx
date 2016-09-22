@@ -1,5 +1,5 @@
 import * as React from "react";
-import { View, Text, TouchableHighlight, StyleSheet, ListView } from 'react-native';
+import { View, Text, TouchableHighlight, RefreshControl, StyleSheet, ListView } from 'react-native';
 import { Actions } from 'react-native-router-flux'
 
 import ListViewDataSource = __React.ListViewDataSource;
@@ -42,7 +42,9 @@ interface articleProps {
 }
 
 interface articleState {
-  dataSource:ListViewDataSource
+  dataSource?: ListViewDataSource;
+  refreshing?: boolean;
+  _listView_ref?: any
 }
 
 class Article extends React.Component<articleProps, articleState> {
@@ -51,24 +53,20 @@ class Article extends React.Component<articleProps, articleState> {
 
     this.state = {
       dataSource: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
+      refreshing: false
     };
   }
 
   componentDidMount() {
-    this.props.tryRequestArticleList(this.props.forumInfo.id, 1);
+    this.props.tryRequestArticleList(this.props.forumInfo.id);
   }
 
   componentWillReceiveProps(props) {
     if (this.shouldActionRefresh(props)) {
       Actions.refresh({title: props.forumInfo.name});
-      this.props.tryRequestArticleList(props.forumInfo.id, 1);
+      this.props.tryRequestArticleList(props.forumInfo.id)
+        .then(() => this.state._listView_ref.scrollTo({ y: 0 }));
     }
-  }
-
-  shouldActionRefresh(props) {
-    const titleChanged = props.forumInfo.name !== this.props.forumInfo.name;
-
-    return titleChanged;
   }
 
   shouldComponentUpdate(props) {
@@ -77,7 +75,23 @@ class Article extends React.Component<articleProps, articleState> {
     return !beforeRefresh;
   }
 
-  onViewPost(postData) {
+  shouldActionRefresh(props) {
+    const titleChanged = props.forumInfo.name !== this.props.forumInfo.name;
+
+    return titleChanged;
+  }
+
+  generateRefreshControl() {
+    return <RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh.bind(this)}/>
+  }
+
+  onRefresh() {
+    this.setState({ refreshing: true });
+    this.props.tryRequestArticleList(this.props.forumInfo.id)
+      .then(() => this.setState({ refreshing: false }));
+  }
+
+  onPressPost(postData) {
     (Actions as any).post({
       postData,
       title: postData.id
@@ -87,7 +101,7 @@ class Article extends React.Component<articleProps, articleState> {
   renderPostData(postData) {
     return (
       <View style={styles.postRow}>
-        <TouchableHighlight onPress={() => this.onViewPost(postData)}>
+        <TouchableHighlight onPress={() => this.onPressPost(postData)}>
           <View style={styles.postRowPress}>
             <View style={styles.postRowInfo}>
               <Text style={styles.rowInfoText}>{`${postData.userid} ${postData.now}`}</Text>
@@ -101,17 +115,18 @@ class Article extends React.Component<articleProps, articleState> {
   }
 
   render() {
-    
-    console.log('article render!', this.props);
 
     const listViewProps = {
       dataSource: this.state.dataSource.cloneWithRows(this.props.articleList),
-      renderRow: this.renderPostData.bind(this)
+      renderRow: this.renderPostData.bind(this),
+      refreshControl: this.generateRefreshControl(),
+      style: styles.listView,
+      ref: (listView) => { this.state._listView_ref = listView; }
     };
 
     return (
       <View style={{ flex: 1, marginTop: 64 }}>
-        <ListView style={styles.listView} {...listViewProps}></ListView>
+        <ListView {...listViewProps}></ListView>
       </View>
     );
   }
