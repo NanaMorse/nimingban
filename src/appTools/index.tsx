@@ -2,6 +2,11 @@ import * as React from 'react';
 import { View, Text, StyleSheet} from 'react-native';
 import ReactElement = __React.ReactElement;
 
+const styles = StyleSheet.create({
+  referenceText: {
+    color: '#789922'
+  }
+});
 
 export function formatContent(content: string) {
   // remove <br />
@@ -10,11 +15,30 @@ export function formatContent(content: string) {
 
   // todo replace <font> node
 
-  // todo check 
+
+  // replace /&gt;&gt;No.\d+\b/
+  const result = replaceStringToTextComponentsArray(content, /(&gt;&gt;No.\d+\b)/gi, function (match, i) {
+    // todo: get reference content
+    return <Text style={styles.referenceText} key={i}>{match.replace('&gt;&gt;', '>>')}</Text>
+  });
+  
   
   return (
     <View>
-      <Text>{content}</Text>
+      <Text>
+        {result}
+      </Text>
     </View>
   );
+}
+
+
+function replaceStringToTextComponentsArray(str: string, reg: RegExp, fn?: Function) {
+  const resultArray = str.split(reg);
+
+  for (let i = 1, len = resultArray.length; i < len; i += 2) {
+    resultArray[i] = fn(resultArray[i], i)
+  }
+  
+  return resultArray;
 }
