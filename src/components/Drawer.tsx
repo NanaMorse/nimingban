@@ -11,7 +11,7 @@ interface Props {
   open: boolean;
 }
 
-class RouterDrawer extends React.Component<Props, any> {
+class DrawerRouter extends React.Component<Props, any> {
   
   render(){
     
@@ -41,4 +41,4 @@ class RouterDrawer extends React.Component<Props, any> {
   }
 }
 
-export default RouterDrawer;
+export default DrawerRouter;

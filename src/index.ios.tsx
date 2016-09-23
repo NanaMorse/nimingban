@@ -3,7 +3,7 @@ import { Provider } from 'react-redux';
 import { Scene } from 'react-native-router-flux';
 
 import RouterContainer from './containers/RouterContainer';
-import RouterDrawer from './components/RouterDrawer';
+import Drawer from './components/Drawer';
 import ArticleContainer from './containers/ArticleContainer';
 import Post from './components/Post';
 
@@ -19,7 +19,7 @@ class App extends React.Component<any, any> {
     
     const drawerSceneProps = {
       key: 'drawer',
-      component: RouterDrawer,
+      component: Drawer,
       initial: true,
       passProps: true,
       open: false

@@ -3,6 +3,7 @@ import { View, Text, TouchableHighlight, RefreshControl, StyleSheet, ListView, s
 import { Actions } from 'react-native-router-flux';
 const events = require('RCTDeviceEventEmitter');
 import { DRAWER_CLOSED } from '../constants/eventTags';
+import * as AppTools from '../appTools';
 
 import ListViewDataSource = __React.ListViewDataSource;
 import ScrollViewStyle = __React.ScrollViewStyle;
@@ -114,11 +115,15 @@ class Article extends React.Component<articleProps, articleState> {
               <Text style={styles.rowInfoText}>{`${postData.userid} ${postData.now}`}</Text>
               <Text style={styles.rowInfoText}>{`reply：${postData.replyCount}`}</Text>
             </View>
-            <Text>{postData.content}</Text>
+            {AppTools.formatContent(postData.content)}
           </View>
         </TouchableHighlight>
       </View>
     );
+  }
+
+  onListEndReached() {
+    console.log('reach end!');
   }
 
   render() {
@@ -130,12 +135,15 @@ class Article extends React.Component<articleProps, articleState> {
       renderRow: this.renderPostData.bind(this),
       refreshControl: this.generateRefreshControl(),
       style: styles.listView,
-      ref: (listView) => { this.state._listView_ref = listView; }
+      ref: (listView) => { this.state._listView_ref = listView; },
+      onEndReached: this.onListEndReached.bind(this)
     };
 
     return (
       <View style={{ flex: 1, marginTop: 64 }}>
-        <ListView {...listViewProps}></ListView>
+        <ListView {...listViewProps}>
+          <RefreshControl refreshing={false}/>
+        </ListView>
       </View>
     );
   }

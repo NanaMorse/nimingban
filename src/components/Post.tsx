@@ -1,6 +1,7 @@
 import * as React from "react";
 import { View, Text, TouchableHighlight, RefreshControl, StyleSheet, ListView } from 'react-native';
 import { API_GET_REPLY_LIST } from '../constants/api'
+import * as AppTools from '../appTools';
 
 import ViewStyle = __React.ViewStyle;
 import { postData, replyData } from '../interface';
@@ -85,7 +86,7 @@ class Post extends React.Component<postProps, postState> {
           <Text style={styles.rowInfoText}>{`${replayData.userid} ${replayData.now}`}</Text>
           <Text style={styles.rowInfoText}>{`No：${replayData.id}`}</Text>
         </View>
-        <Text>{replayData.content}</Text>
+        {AppTools.formatContent(replayData.content)}
       </View>
     )
   }
