@@ -33,8 +33,9 @@ export function formatContent(content: string) {
 }
 
 
-function replaceStringToTextComponentsArray(str: string, reg: RegExp, fn?: Function) {
-  const resultArray = str.split(reg);
+function replaceStringToTextComponentsArray(str: string | any[], reg: RegExp, fn?: Function) {
+
+  const resultArray: any[] = typeof str === 'string' ? str.split(reg) : str;
 
   for (let i = 1, len = resultArray.length; i < len; i += 2) {
     resultArray[i] = fn(resultArray[i], i)

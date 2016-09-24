@@ -1,5 +1,7 @@
 export interface replyData {
   admin: '0' | '1',
+  img: string;
+  ext: string;
   content: string,
   email: string,
   id: string,

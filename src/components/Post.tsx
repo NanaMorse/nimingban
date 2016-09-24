@@ -1,7 +1,8 @@
 import * as React from "react";
-import { View, Text, TouchableHighlight, RefreshControl, StyleSheet, ListView } from 'react-native';
+import { View, Text, TouchableHighlight, RefreshControl, StyleSheet, ListView, Image, Dimensions } from 'react-native';
 import { API_GET_REPLY_LIST } from '../constants/api'
 import * as AppTools from '../appTools';
+import { API_GET_IMAGE_THUMB_URL } from '../constants/api'
 
 import ViewStyle = __React.ViewStyle;
 import { postData, replyData } from '../interface';
@@ -29,6 +30,12 @@ const styles = StyleSheet.create({
   rowInfoText: {
     color: '#94999e',
     fontSize: 12
+  },
+
+  rowImage: {
+    marginTop: 10,
+    width: Dimensions.get('window').width * 0.5,
+    height: 200
   }
 });
 
@@ -87,6 +94,10 @@ class Post extends React.Component<postProps, postState> {
           <Text style={styles.rowInfoText}>{`No：${replayData.id}`}</Text>
         </View>
         {AppTools.formatContent(replayData.content)}
+        { replayData.img ?
+          <Image style={styles.rowImage} source={{uri: API_GET_IMAGE_THUMB_URL(replayData.img, replayData.ext)}}/>
+          : null
+        }
       </View>
     )
   }
@@ -101,7 +112,9 @@ class Post extends React.Component<postProps, postState> {
       id: postData.id,
       name: postData.name,
       now: postData.now,
-      userid: postData.userid
+      userid: postData.userid,
+      img: postData.img,
+      ext: postData.ext
     };
     
     const replyViewProps = {

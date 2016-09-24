@@ -1,13 +1,15 @@
 import * as React from "react";
-import { View, Text, TouchableHighlight, RefreshControl, StyleSheet, ListView, setTimeout } from 'react-native';
+import { View, Text, TouchableHighlight, RefreshControl, StyleSheet, ListView, Image, Dimensions } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 const events = require('RCTDeviceEventEmitter');
 import { DRAWER_CLOSED } from '../constants/eventTags';
 import * as AppTools from '../appTools';
+import { API_GET_IMAGE_THUMB_URL } from '../constants/api'
 
 import ListViewDataSource = __React.ListViewDataSource;
 import ScrollViewStyle = __React.ScrollViewStyle;
 import ViewStyle = __React.ViewStyle;
+import { postData } from '../interface';
 
 const styles = StyleSheet.create({
   listView: {
@@ -34,6 +36,12 @@ const styles = StyleSheet.create({
   rowInfoText: {
     color: '#94999e',
     fontSize: 12
+  },
+  
+  rowImage: {
+    marginTop: 10,
+    width: Dimensions.get('window').width * 0.5,
+    height: 200
   }
 });
 
@@ -106,7 +114,7 @@ class Article extends React.Component<articleProps, articleState> {
     });
   }
 
-  renderPostData(postData) {
+  renderPostData(postData: postData) {
     return (
       <View style={styles.postRow}>
         <TouchableHighlight onPress={() => this.onPressPost(postData)}>
@@ -116,6 +124,10 @@ class Article extends React.Component<articleProps, articleState> {
               <Text style={styles.rowInfoText}>{`reply：${postData.replyCount}`}</Text>
             </View>
             {AppTools.formatContent(postData.content)}
+            { postData.img ? 
+              <Image style={styles.rowImage} source={{uri: API_GET_IMAGE_THUMB_URL(postData.img, postData.ext)}}/> 
+              : null 
+            }
           </View>
         </TouchableHighlight>
       </View>
