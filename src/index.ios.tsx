@@ -6,6 +6,7 @@ import RouterContainer from './containers/RouterContainer';
 import Drawer from './components/Drawer';
 import ArticleContainer from './containers/ArticleContainer';
 import Post from './components/Post';
+import ImageViewer from './components/ImageViewer';
 
 import store from './store';
 
@@ -41,16 +42,22 @@ class App extends React.Component<any, any> {
       component: Post
     };
     
+    const imageViewerSceneProps = {
+      key: 'imageViewer',
+      component: ImageViewer
+    };
+    
     return (
-      <Provider store = { store }>
+      <Provider store={store}>
           <RouterContainer>
             <Scene key="root">
               <Scene {...drawerSceneProps}>
                 <Scene key="main">
-                  <Scene { ...articleSceneProps }/>
+                  <Scene {...articleSceneProps}/>
                 </Scene>
               </Scene>
-              <Scene { ...postSceneProps }/>
+              <Scene {...postSceneProps}/>
+              <Scene {...imageViewerSceneProps}/>
             </Scene>
           </RouterContainer>
       </Provider>

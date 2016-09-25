@@ -4,12 +4,13 @@ import { Actions } from 'react-native-router-flux';
 const events = require('RCTDeviceEventEmitter');
 import { DRAWER_CLOSED } from '../constants/eventTags';
 import * as AppTools from '../appTools';
-import { API_GET_IMAGE_THUMB_URL } from '../constants/api'
+import { API_GET_IMAGE_THUMB_URL } from '../constants/api';
 
 import ListViewDataSource = __React.ListViewDataSource;
 import ScrollViewStyle = __React.ScrollViewStyle;
 import ViewStyle = __React.ViewStyle;
 import { postData } from '../interface';
+import ReactElement = __React.ReactElement;
 
 const styles = StyleSheet.create({
   listView: {
@@ -39,7 +40,6 @@ const styles = StyleSheet.create({
   },
   
   rowImage: {
-    marginTop: 10,
     width: Dimensions.get('window').width * 0.5,
     height: 200
   }
@@ -114,6 +114,40 @@ class Article extends React.Component<articleProps, articleState> {
     });
   }
 
+  onPressImageThumb(imageLink: string, imageExt: string) {
+    (Actions as any).imageViewer({
+      imageLink, imageExt,
+      title: 'show Image'
+    });
+  }
+
+  onImageLoad(e) {
+    console.log(e.target)
+  }
+
+  renderImageThumb(imageLink: string, imageExt: string) {
+    if (imageLink) {
+      const touchAbleAreaProps = {
+        style: styles.rowImage,
+        onPress: () => this.onPressImageThumb(imageLink, imageExt)
+      };
+      
+      const ImageProps = {
+        style: styles.rowImage,
+        source: { uri: API_GET_IMAGE_THUMB_URL(imageLink, imageExt) },
+        //onLoad: this.onImageLoad.bind(this)
+      };
+
+      return (
+        <TouchableHighlight {...touchAbleAreaProps}>
+          <Image {...ImageProps}/>
+        </TouchableHighlight>
+      );
+    } else {
+      return null;
+    }
+  }
+
   renderPostData(postData: postData) {
     return (
       <View style={styles.postRow}>
@@ -124,10 +158,8 @@ class Article extends React.Component<articleProps, articleState> {
               <Text style={styles.rowInfoText}>{`reply：${postData.replyCount}`}</Text>
             </View>
             {AppTools.formatContent(postData.content)}
-            { postData.img ? 
-              <Image style={styles.rowImage} source={{uri: API_GET_IMAGE_THUMB_URL(postData.img, postData.ext)}}/> 
-              : null 
-            }
+            <View style={ postData.img ? {marginBottom: 10} : null }></View>
+            {this.renderImageThumb(postData.img, postData.ext)}
           </View>
         </TouchableHighlight>
       </View>

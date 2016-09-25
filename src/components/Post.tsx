@@ -3,6 +3,7 @@ import { View, Text, TouchableHighlight, RefreshControl, StyleSheet, ListView, I
 import { API_GET_REPLY_LIST } from '../constants/api'
 import * as AppTools from '../appTools';
 import { API_GET_IMAGE_THUMB_URL } from '../constants/api'
+import { Actions } from 'react-native-router-flux';
 
 import ViewStyle = __React.ViewStyle;
 import { postData, replyData } from '../interface';
@@ -33,7 +34,6 @@ const styles = StyleSheet.create({
   },
 
   rowImage: {
-    marginTop: 10,
     width: Dimensions.get('window').width * 0.5,
     height: 200
   }
@@ -84,7 +84,36 @@ class Post extends React.Component<postProps, postState> {
   generateRefreshControl() {
     return <RefreshControl refreshing={this.state.refreshing} onRefresh={this.tryRequestReplys.bind(this)}/>
   }
-  
+
+  onPressImageThumb(imageLink: string, imageExt: string) {
+    (Actions as any).imageViewer({
+      imageLink, imageExt
+    });
+  }
+
+  renderImageThumb(imageLink: string, imageExt: string) {
+    if (imageLink) {
+      const touchAbleAreaProps = {
+        style: styles.rowImage,
+        onPress: () => this.onPressImageThumb(imageLink, imageExt)
+      };
+
+      const ImageProps = {
+        style: styles.rowImage,
+        source: { uri: API_GET_IMAGE_THUMB_URL(imageLink, imageExt) },
+        //onLoad: this.onImageLoad.bind(this)
+      };
+
+      return (
+        <TouchableHighlight {...touchAbleAreaProps}>
+          <Image {...ImageProps}/>
+        </TouchableHighlight>
+      );
+    } else {
+      return null;
+    }
+  }
+
 
   renderReplyData(replayData: replyData) {
     return (
@@ -94,10 +123,8 @@ class Post extends React.Component<postProps, postState> {
           <Text style={styles.rowInfoText}>{`No：${replayData.id}`}</Text>
         </View>
         {AppTools.formatContent(replayData.content)}
-        { replayData.img ?
-          <Image style={styles.rowImage} source={{uri: API_GET_IMAGE_THUMB_URL(replayData.img, replayData.ext)}}/>
-          : null
-        }
+        <View style={ replayData.img ? {marginBottom: 10} : null }></View>
+        {this.renderImageThumb(replayData.img, replayData.ext)}
       </View>
     )
   }
