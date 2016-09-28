@@ -115,9 +115,11 @@ class Article extends React.Component<articleProps, articleState> {
   }
 
   onPressImageThumb(imageLink: string, imageExt: string) {
-    (Actions as any).imageViewer({
-      imageLink, imageExt,
-      title: 'show Image'
+    Image.getSize(API_GET_IMAGE_THUMB_URL(imageLink, imageExt), function (width, height) {
+      (Actions as any).imageViewer({
+        imageLink, imageExt, width, height,
+        title: 'show Image'
+      });
     });
   }
 

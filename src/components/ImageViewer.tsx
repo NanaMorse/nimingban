@@ -5,6 +5,8 @@ import ViewStyle = __React.ViewStyle;
 
 const RCTImageStoreManager = require('NativeModules').ImageStoreManager;
 
+const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
+
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
@@ -21,6 +23,9 @@ const styles = StyleSheet.create({
 interface ImageViewerProps {
   imageLink: string;
   imageExt: string;
+
+  width: number;
+  height: number;
 }
 
 interface ImageViewerState {
@@ -30,14 +35,29 @@ interface ImageViewerState {
 class ImageViewer extends React.Component<ImageViewerProps, ImageViewerState> {
   constructor(props) {
     super();
-    
+
     console.log('to here!');
   }
 
   render() {
 
+    const { width, height } = this.props;
+
+    const imageAreaWidth = windowWidth;
+    const imageAreaHeight = windowHeight - 64;
+
+    const imageStyle = {width: 0, height: 0};
+
+    if (width > height) {
+      imageStyle.width = imageAreaWidth;
+      imageStyle.height = imageAreaWidth * height / width;
+    } else {
+      imageStyle.width = imageAreaHeight * width / height;
+      imageStyle.height = imageAreaHeight;
+    }
+
     const imageProps = {
-      style: styles.image,
+      style: imageStyle,
       source: { uri: API_GET_IMAGE_FULL_URL(this.props.imageLink, this.props.imageExt) }
     };
 
