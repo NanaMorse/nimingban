@@ -1,4 +1,4 @@
-import * as React from "react";
+ import * as React from "react";
 import { Provider } from 'react-redux';
 import { Scene } from 'react-native-router-flux';
 

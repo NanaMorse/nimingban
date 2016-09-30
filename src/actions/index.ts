@@ -40,22 +40,24 @@ function requestArticleList() {
   }
 }
 
-function receiveArticleList(articleList) {
+function receiveArticleList(articleList, isLoadMore) {
   return {
     type: Types.RECEIVE_ARTICLE_LIST,
     articleList,
-    receiveAt: Date.now()
+    receiveAt: Date.now(),
+    isLoadMore
   }
 }
 
-export function tryRequestArticleList(id, page = 1) {
+export function tryRequestArticleList(id, page = 1, isLoadMore) {
+
   return function (dispatch) {
     dispatch(requestArticleList());
 
     return fetch(Api.API_GET_ARTICLE_LIST(id, page))
       .then(response => response.json())
       .then(articleList => {
-        dispatch(receiveArticleList(articleList));
+        dispatch(receiveArticleList(articleList, isLoadMore));
       });
   }
 }

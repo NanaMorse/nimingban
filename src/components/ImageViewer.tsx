@@ -35,8 +35,6 @@ interface ImageViewerState {
 class ImageViewer extends React.Component<ImageViewerProps, ImageViewerState> {
   constructor(props) {
     super();
-
-    console.log('to here!');
   }
 
   render() {

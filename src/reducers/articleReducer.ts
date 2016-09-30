@@ -19,8 +19,10 @@ export default (state:any = {}, action: any) => {
     }
 
     case Types.RECEIVE_ARTICLE_LIST : {
+      const articleList = action.isLoadMore ? [...state.articleList, ...action.articleList] : action.articleList;
+
       return Object.assign({}, state, {
-        articleList: action.articleList,
+        articleList: articleList,
         receiveAt: action.receiveAt
       });
     }

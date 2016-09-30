@@ -8,8 +8,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    tryRequestArticleList: function (id, page) {
-      return dispatch(Actions.tryRequestArticleList(id, page));
+    tryRequestArticleList: function (id, page, isLoadMore) {
+      return dispatch(Actions.tryRequestArticleList(id, page, isLoadMore));
     }
   }
 }

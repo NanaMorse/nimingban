@@ -5,6 +5,7 @@ const events = require('RCTDeviceEventEmitter');
 import { DRAWER_CLOSED } from '../constants/eventTags';
 import * as AppTools from '../appTools';
 import { API_GET_IMAGE_THUMB_URL } from '../constants/api';
+import PullUpListView from '../react-native-pull-up-listview';
 
 import ListViewDataSource = __React.ListViewDataSource;
 import ScrollViewStyle = __React.ScrollViewStyle;
@@ -53,8 +54,10 @@ interface articleProps {
 }
 
 interface articleState {
+  hasShowPages?: number;
   dataSource?: ListViewDataSource;
   refreshing?: boolean;
+  loading?: boolean;
   _listView_ref?: any
 }
 
@@ -63,8 +66,10 @@ class Article extends React.Component<articleProps, articleState> {
     super();
 
     this.state = {
+      hasShowPages: 1,
       dataSource: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
-      refreshing: false
+      refreshing: false,
+      loading: false
     };
   }
 
@@ -78,7 +83,7 @@ class Article extends React.Component<articleProps, articleState> {
       
       events.addListener(DRAWER_CLOSED, () => {
         this.props.tryRequestArticleList(props.forumInfo.id)
-          .then(() => this.state._listView_ref.scrollTo({ y: 0 }));
+          .then(() => this.state._listView_ref.scrollTo({ y: 0, animated: false }));
         events.removeAllListeners(DRAWER_CLOSED);
       });
     }
@@ -92,7 +97,7 @@ class Article extends React.Component<articleProps, articleState> {
   }
 
   shouldActionRefresh(props) {
-    const titleChanged = props.forumInfo.name !== this.props.forumInfo.name;
+    const titleChanged = props.forumInfo.id !== this.props.forumInfo.id;
 
     return titleChanged;
   }
@@ -124,7 +129,7 @@ class Article extends React.Component<articleProps, articleState> {
   }
 
   onImageLoad(e) {
-    console.log(e.target)
+
   }
 
   renderImageThumb(imageLink: string, imageExt: string) {
@@ -136,8 +141,7 @@ class Article extends React.Component<articleProps, articleState> {
       
       const ImageProps = {
         style: styles.rowImage,
-        source: { uri: API_GET_IMAGE_THUMB_URL(imageLink, imageExt) },
-        //onLoad: this.onImageLoad.bind(this)
+        source: { uri: API_GET_IMAGE_THUMB_URL(imageLink, imageExt) }
       };
 
       return (
@@ -168,13 +172,15 @@ class Article extends React.Component<articleProps, articleState> {
     );
   }
 
-  onListEndReached() {
-    console.log('reach end!');
+  onLoadMore() {
+    this.setState({loading: true});
+
+    this.props
+      .tryRequestArticleList(this.props.forumInfo.id, ++this.state.hasShowPages, true)
+      .then(() => this.setState({ loading: false }));
   }
 
   render() {
-    
-    console.log('render article');
 
     const listViewProps = {
       dataSource: this.state.dataSource.cloneWithRows(this.props.articleList),
@@ -182,14 +188,13 @@ class Article extends React.Component<articleProps, articleState> {
       refreshControl: this.generateRefreshControl(),
       style: styles.listView,
       ref: (listView) => { this.state._listView_ref = listView; },
-      onEndReached: this.onListEndReached.bind(this)
+      loading: this.state.loading,
+      onLoadMore: this.onLoadMore.bind(this)
     };
 
     return (
       <View style={{ flex: 1, marginTop: 64 }}>
-        <ListView {...listViewProps}>
-          <RefreshControl refreshing={false}/>
-        </ListView>
+        <PullUpListView {...listViewProps}></PullUpListView>
       </View>
     );
   }
