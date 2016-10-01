@@ -4,6 +4,7 @@ import { API_GET_REPLY_LIST } from '../constants/api'
 import * as AppTools from '../appTools';
 import { API_GET_IMAGE_THUMB_URL } from '../constants/api'
 import { Actions } from 'react-native-router-flux';
+import PullUpListView from '../react-native-pull-up-listview';
 
 import ViewStyle = __React.ViewStyle;
 import { postData, replyData } from '../interface';
@@ -86,8 +87,15 @@ class Post extends React.Component<postProps, postState> {
   }
 
   onPressImageThumb(imageLink: string, imageExt: string) {
-    (Actions as any).imageViewer({
-      imageLink, imageExt
+    const thumbUrl = API_GET_IMAGE_THUMB_URL(imageLink, imageExt);
+
+    Image.getSize(thumbUrl, function (width, height) {
+      (Actions as any).imageViewer({
+        imageLink, imageExt, width, height,
+        title: 'show Image'
+      });
+    }, function () {
+      console.log('get Size failure:', thumbUrl)
     });
   }
 

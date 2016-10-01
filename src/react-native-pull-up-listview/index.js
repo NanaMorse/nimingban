@@ -8,6 +8,8 @@ import {
   ActivityIndicator
 } from 'react-native';
 
+import IndicatorCircle from './IndicatorCircle';
+
 const PropTypes = React.PropTypes;
 
 const styles = StyleSheet.create({
@@ -23,7 +25,6 @@ const styles = StyleSheet.create({
 
 const STATUS_NORMAL = 0;
 const STATUS_PRE_LOAD = 1;
-const STATUS_CANCEL_LOAD = 2;
 const STATUS_LOADING = 3;
 
 class PullUpListView extends React.Component {
@@ -33,7 +34,7 @@ class PullUpListView extends React.Component {
 
     this.state = {
       statusCode: props.loading ? STATUS_LOADING : STATUS_NORMAL,
-      refreshing: false
+      refreshing: false,
     };
 
     this.responderHandling = false;
@@ -44,37 +45,23 @@ class PullUpListView extends React.Component {
     this.panResponder = PanResponder.create({
       onPanResponderMove: () => {
         this.responderHandling = true;
-
-        // todo if current move direction is to scroll down, try to cancel load more
-/*        if (gestureState.vy > 0 ) {
-          if (!this.state.statusCode === STATUS_PRE_LOAD) return;
-
-          this.setState({
-            statusCode: STATUS_CANCEL_LOAD
-          });
-        } else {
-          if (!this.state.statusCode === STATUS_CANCEL_LOAD) return;
-
-          this.setState({
-            statusCode: STATUS_PRE_LOAD
-          });
-        }*/
       },
 
       onPanResponderRelease: () => {
 
         this.responderHandling = false;
 
-        // todo check if use cancel
         if (this.state.statusCode === STATUS_PRE_LOAD) {
-          this.props.onLoadMore && this.props.onLoadMore();
+          this.listViewRef.scrollTo({
+            y: this.OFFSET_Y_MAX
+          });
         }
       }
     });
   }
 
   componentDidMount() {
-    // register all methods for listView
+    // register all methods for listView instance
     const methodsList = [
       'getMetrics', 'scrollTo'
     ];
@@ -101,15 +88,14 @@ class PullUpListView extends React.Component {
     if (statusCode === STATUS_NORMAL) return null;
 
     if (statusCode === STATUS_PRE_LOAD) {
-      footerContext = this.props.preLoadElement || (
-          <Text>{this.props.preLoadTitle}</Text>
-        );
-    }
-
-    if (statusCode === STATUS_CANCEL_LOAD) {
-      footerContext = this.props.cancelLoadElement || (
-          <Text>{this.props.cancelLoadTitle}</Text>
-        );
+      footerContext = (
+        <View style={{ alignItems: 'center' }}>
+          <IndicatorCircle
+            ref= {(indicatorCircle) => { this.indicatorCircle = indicatorCircle; }}
+            onCircleComplete={this.props.onLoadMore}
+          />
+        </View>
+      );
     }
 
     if (statusCode === STATUS_LOADING) {
@@ -118,7 +104,7 @@ class PullUpListView extends React.Component {
             <ActivityIndicator
               size='large'
               animating={true}/>
-            <Text>{this.props.loadingTitle}</Text>
+            <Text>{this.props.title}</Text>
           </View>
         );
     }
@@ -139,12 +125,31 @@ class PullUpListView extends React.Component {
     const OFFSET_Y_MAX = containerHeight > contentHeight ? 0 : contentHeight - containerHeight;
 
     if (contentOffset.y > (OFFSET_Y_MAX + this.props.pullDistance) && this.responderHandling) {
+
       if (this.state.statusCode === STATUS_NORMAL) {
+
+        this.OFFSET_Y_MAX = OFFSET_Y_MAX;
+
         this.setState({
           statusCode: STATUS_PRE_LOAD
         });
       }
     }
+
+    else if (contentOffset.y < (this.OFFSET_Y_MAX + this.props.pullDistance)) {
+      if (this.state.statusCode === STATUS_PRE_LOAD) {
+        this.setState({
+          statusCode: STATUS_NORMAL
+        });
+      }
+    }
+
+    if (this.state.statusCode === STATUS_PRE_LOAD) {
+
+      const renderCircleDeg = (- 9 * (OFFSET_Y_MAX - contentOffset.y)) - 270;
+      this.indicatorCircle.refreshRenderedDeg(renderCircleDeg);
+    }
+
   }
 
   onContainerLayout(e) {
@@ -154,19 +159,17 @@ class PullUpListView extends React.Component {
   render() {
     const containerProps = {
       onLayout: this.onContainerLayout.bind(this),
-      style: [styles.container, this.props.style]
+      style: styles.container
     };
 
     const listViewProps = {
-      dataSource: this.props.dataSource,
-      renderRow: this.props.renderRow,
-      refreshControl: this.props.refreshControl || null,
-
       renderFooter: this.renderFooter.bind(this),
       onScroll: mixFuncs(this.onScroll.bind(this), this.props.onScroll),
       onLoading: this.props.onLoading,
 
       ref: (listView) => { this.listViewRef = listView; },
+
+      scrollEventThrottle: 100
     };
 
     return (
@@ -184,23 +187,10 @@ function mixFuncs(...funcs) {
 }
 
 PullUpListView.propTypes = {
-  dataSource: PropTypes.any,
-  renderRow: PropTypes.func,
-  refreshControl: PropTypes.element,
   pullDistance: PropTypes.number,
-  style: PropTypes.any,
-
-  preLoadElement: PropTypes.element,
-  preLoadStyle: PropTypes.any,
-  preLoadTitle: PropTypes.string,
-
-  cancelLoadElement: PropTypes.element,
-  cancelLoadStyle: PropTypes.any,
-  cancelLoadTitle: PropTypes.string,
-
-  loadingElement: PropTypes.element,
-  loadingStyle: PropTypes.any,
-  loadingTitle: PropTypes.string,
+  tintColor: PropTypes.string,
+  title: PropTypes.string,
+  titleColor: PropTypes.string,
 
   loading: PropTypes.bool,
   onLoadMore: PropTypes.func
@@ -208,9 +198,9 @@ PullUpListView.propTypes = {
 
 PullUpListView.defaultProps = {
   pullDistance: 25,
-  preLoadTitle: 'Release to Load More',
-  cancelLoadTitle: 'Release to Cancel',
-  loadingTitle: 'Load More...'
+  tintColor: '#B7B7B7',
+  title: 'Load More...',
+  titleColor: '#000000'
 };
 
 
