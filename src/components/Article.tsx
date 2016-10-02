@@ -5,7 +5,7 @@ const events = require('RCTDeviceEventEmitter');
 import { DRAWER_CLOSED } from '../constants/eventTags';
 import * as AppTools from '../appTools';
 import { API_GET_IMAGE_THUMB_URL } from '../constants/api';
-import PullUpListView from '../react-native-pull-up-listview';
+import PullUpListView from 'react-native-pull-up-listview';
 
 import ListViewDataSource = __React.ListViewDataSource;
 import ScrollViewStyle = __React.ScrollViewStyle;

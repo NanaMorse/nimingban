@@ -4,7 +4,7 @@ import { API_GET_REPLY_LIST } from '../constants/api'
 import * as AppTools from '../appTools';
 import { API_GET_IMAGE_THUMB_URL } from '../constants/api'
 import { Actions } from 'react-native-router-flux';
-import PullUpListView from '../react-native-pull-up-listview';
+import PullUpListView from 'react-native-pull-up-listview';
 
 import ViewStyle = __React.ViewStyle;
 import { postData, replyData } from '../interface';
@@ -48,8 +48,10 @@ interface postState {
   replyDataSource?: any;
   requesting?: boolean;
   refreshing?: boolean;
+  loading?: boolean;
   getError?: boolean;
-  replys?: replyData[]
+  replys?: replyData[];
+  replysPage?: number;
 }
 
 class Post extends React.Component<postProps, postState> {
@@ -60,8 +62,10 @@ class Post extends React.Component<postProps, postState> {
       replyDataSource: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
       requesting: false,
       refreshing: false,
+      loading: false,
       getError: false,
-      replys: []
+      replys: [],
+      replysPage: 1
     };
     
   }
@@ -70,14 +74,14 @@ class Post extends React.Component<postProps, postState> {
     this.tryRequestReplys();
   }
   
-  tryRequestReplys(page = 1) {
+  tryRequestReplys(page = 1, loadMore?) {
     // will render
     this.setState({ requesting: true });
     
     fetch(API_GET_REPLY_LIST(this.props.postData.id, page))
       .then(response => response.json())
       .then((postData: postData) => {
-        this.setState({ replys: postData.replys })
+        this.setState({ replys: loadMore ? [...this.state.replys, ...postData.replys] : postData.replys })
       })
       .catch(error => console.log(error));
   }
@@ -156,12 +160,15 @@ class Post extends React.Component<postProps, postState> {
       dataSource: this.state.replyDataSource.cloneWithRows([mainContent, ...this.state.replys]),
       renderRow: this.renderReplyData.bind(this),
       refreshControl: this.generateRefreshControl(),
-      style: styles.listView
+      style: styles.listView,
+
+      loading: this.state.loading,
+      onLoadMore: () => this.tryRequestReplys(++this.state.replysPage, true)
     };
 
     return (
       <View style={{ flex: 1, marginTop: 64 }}>
-        <ListView { ...replyViewProps }></ListView>
+        <PullUpListView { ...replyViewProps }></PullUpListView>
       </View>
     )
   }
