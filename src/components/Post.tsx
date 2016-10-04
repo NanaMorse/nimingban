@@ -46,12 +46,10 @@ interface postProps {
 
 interface postState {
   replyDataSource?: any;
-  requesting?: boolean;
   refreshing?: boolean;
   loading?: boolean;
-  getError?: boolean;
   replys?: replyData[];
-  replysPage?: number;
+  currentPage?: number;
 }
 
 class Post extends React.Component<postProps, postState> {
@@ -60,12 +58,10 @@ class Post extends React.Component<postProps, postState> {
     
     this.state = {
       replyDataSource: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
-      requesting: false,
       refreshing: false,
       loading: false,
-      getError: false,
       replys: [],
-      replysPage: 1
+      currentPage: 1
     };
     
   }
@@ -75,19 +71,35 @@ class Post extends React.Component<postProps, postState> {
   }
   
   tryRequestReplys(page = 1, loadMore?) {
-    // will render
-    this.setState({ requesting: true });
-    
-    fetch(API_GET_REPLY_LIST(this.props.postData.id, page))
+    return fetch(API_GET_REPLY_LIST(this.props.postData.id, page))
       .then(response => response.json())
       .then((postData: postData) => {
+
+        if (postData.replys.length && loadMore) {
+          this.state.currentPage ++;
+        }
+
         this.setState({ replys: loadMore ? [...this.state.replys, ...postData.replys] : postData.replys })
       })
       .catch(error => console.log(error));
   }
 
+  onRefresh() {
+    this.setState({ refreshing: true });
+    this.tryRequestReplys().then(() => {
+      this.setState({ refreshing: false });
+    });
+  }
+
   generateRefreshControl() {
-    return <RefreshControl refreshing={this.state.refreshing} onRefresh={this.tryRequestReplys.bind(this)}/>
+    return <RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh.bind(this)}/>
+  }
+
+  onLoadMore() {
+    this.setState({ loading: true });
+    this.tryRequestReplys(this.state.currentPage + 1, true).then(() => {
+      this.setState({ loading: false });
+    });
   }
 
   onPressImageThumb(imageLink: string, imageExt: string) {
@@ -163,7 +175,7 @@ class Post extends React.Component<postProps, postState> {
       style: styles.listView,
 
       loading: this.state.loading,
-      onLoadMore: () => this.tryRequestReplys(++this.state.replysPage, true)
+      onLoadMore: this.onLoadMore.bind(this)
     };
 
     return (
