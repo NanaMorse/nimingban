@@ -12,12 +12,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  } as ViewStyle,
-
-  image: {
-    width: Dimensions.get('window').width,
-    height: 400
-  }
+    paddingTop: 64
+  } as ViewStyle
 });
 
 interface ImageViewerProps {
@@ -46,7 +42,7 @@ class ImageViewer extends React.Component<ImageViewerProps, ImageViewerState> {
 
     const imageStyle = {width: 0, height: 0};
 
-    if (width > height) {
+    if (width >= height) {
       imageStyle.width = imageAreaWidth;
       imageStyle.height = imageAreaWidth * height / width;
     } else {

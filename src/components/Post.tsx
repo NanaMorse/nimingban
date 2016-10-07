@@ -140,10 +140,24 @@ class Post extends React.Component<postProps, postState> {
 
 
   renderReplyData(replayData: replyData) {
+
+    const isPoReply = this.props.postData.userid === replayData.userid;
+    const isAdmin = replayData.admin === '1';
+
+    const userIdStyle = [styles.rowInfoText, isPoReply ? {
+      fontWeight: '700',
+      color: '#000'
+    } : null, isAdmin ? {
+      color: 'red'
+    } : null];
+
     return (
       <View style={styles.contentRow}>
         <View style={styles.contentRowInfo}>
-          <Text style={styles.rowInfoText}>{`${replayData.userid} ${replayData.now}`}</Text>
+          <Text style={styles.rowInfoText}>
+            <Text style={userIdStyle}>{`${isPoReply ? `${replayData.userid}(PO)` : replayData.userid}`}</Text>
+            {` ${replayData.now}`}
+          </Text>
           <Text style={styles.rowInfoText}>{`No：${replayData.id}`}</Text>
         </View>
         {AppTools.formatContent(replayData.content)}
