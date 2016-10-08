@@ -155,12 +155,21 @@ class Article extends React.Component<articleProps, articleState> {
   }
 
   renderPostData(postData: postData) {
+
+    const isAdmin = postData.admin === '1';
+    const userIdStyle = [styles.rowInfoText, isAdmin ? {
+      color: 'red'
+    } : null];
+
     return (
       <View style={styles.postRow}>
         <TouchableHighlight onPress={() => this.onPressPost(postData)}>
           <View style={styles.postRowPress}>
             <View style={styles.postRowInfo}>
-              <Text style={styles.rowInfoText}>{`${postData.userid} ${postData.now}`}</Text>
+              <Text style={styles.rowInfoText}>
+                <Text style={userIdStyle}>{`${postData.userid}`}</Text>
+                {` ${postData.now}`}
+              </Text>
               <Text style={styles.rowInfoText}>{`reply：${postData.replyCount}`}</Text>
             </View>
             {AppTools.formatContent(postData.content)}

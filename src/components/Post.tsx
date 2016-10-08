@@ -5,6 +5,7 @@ import * as AppTools from '../appTools';
 import { API_GET_IMAGE_THUMB_URL } from '../constants/api'
 import { Actions } from 'react-native-router-flux';
 import PullUpListView from 'react-native-pull-up-listview';
+import Toast from './Toast';
 
 import ViewStyle = __React.ViewStyle;
 import { postData, replyData } from '../interface';
@@ -168,7 +169,6 @@ class Post extends React.Component<postProps, postState> {
   }
   
   render() {
-    
     const postData = this.props.postData;
     const mainContent = {
       admin: postData.admin,
@@ -195,6 +195,7 @@ class Post extends React.Component<postProps, postState> {
     return (
       <View style={{ flex: 1, marginTop: 64 }}>
         <PullUpListView { ...replyViewProps }></PullUpListView>
+        <Toast />
       </View>
     )
   }

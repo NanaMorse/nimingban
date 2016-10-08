@@ -7,6 +7,7 @@ const RCTImageStoreManager = require('NativeModules').ImageStoreManager;
 
 const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
 
+// todo image scale
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
