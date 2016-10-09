@@ -9,6 +9,7 @@ import Toast from './Toast';
 
 import ViewStyle = __React.ViewStyle;
 import { postData, replyData } from '../interface';
+import ReactElement = __React.ReactElement;
 
 const styles = StyleSheet.create({
   listView: {
@@ -51,6 +52,8 @@ interface postState {
   loading?: boolean;
   replys?: replyData[];
   currentPage?: number;
+
+  toastRef?: Toast
 }
 
 class Post extends React.Component<postProps, postState> {
@@ -62,7 +65,9 @@ class Post extends React.Component<postProps, postState> {
       refreshing: false,
       loading: false,
       replys: [],
-      currentPage: 1
+      currentPage: 1,
+
+      toastRef: null
     };
     
   }
@@ -75,6 +80,10 @@ class Post extends React.Component<postProps, postState> {
     return fetch(API_GET_REPLY_LIST(this.props.postData.id, page))
       .then(response => response.json())
       .then((postData: postData) => {
+
+        if (!postData.replys.length) {
+          return this.state.toastRef.show('没有更多啦！');
+        }
 
         if (postData.replys.length && loadMore) {
           this.state.currentPage ++;
@@ -193,9 +202,11 @@ class Post extends React.Component<postProps, postState> {
     };
 
     return (
-      <View style={{ flex: 1, marginTop: 64 }}>
-        <PullUpListView { ...replyViewProps }></PullUpListView>
-        <Toast />
+      <View style={{flex: 1}}>
+        <View style={{ flex: 1, marginTop: 64 }}>
+          <PullUpListView { ...replyViewProps }></PullUpListView>
+        </View>
+        <Toast ref={(toastRef) => this.state.toastRef = toastRef}/>
       </View>
     )
   }
