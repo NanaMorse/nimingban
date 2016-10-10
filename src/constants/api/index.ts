@@ -11,3 +11,5 @@ export const API_GET_REPLY_LIST = (id, page) => `${HOST}/Api/thread/?id=${id}&pa
 export const API_GET_IMAGE_THUMB_URL = (imageLink, imageExt) => `http://img1.nimingban.com/thumb/${imageLink}${imageExt}`;
 
 export const API_GET_IMAGE_FULL_URL = (imageLink, imageExt) => `http://img1.nimingban.com/image/${imageLink}${imageExt}`;
+
+export const API_POST_REPLY = () => `${HOST}/Home/Forum/doReplyThread.html?${APP_ID_QUERY}`;

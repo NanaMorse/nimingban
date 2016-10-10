@@ -1,11 +1,11 @@
 import * as React from "react";
-import { View, Text, StyleSheet, Dimensions, Animated, setTimeout } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Animated } from 'react-native';
 import ViewStyle = __React.ViewStyle;
 import TextStyle = __React.TextStyle;
 
 const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
 
-// todo make toast usable and beautiful
+// todo add more animation
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
@@ -85,10 +85,10 @@ class Toast extends React.Component<ToastProps, ToastState> {
 
   startSimpleFadeAnimate(fadeDuration: number = 300, persistedTime: number = 1000) {
 
-    const getSimpleFadeFunc = (toValue) => {
+    const getSimpleFadeFunc = (toValue, delay = 0) => {
       return (callback?) => {
         Animated.timing(this.state.animatedOpacity, {
-          toValue,
+          toValue, delay,
           duration: fadeDuration
         }).start(callback);
       }
@@ -96,9 +96,9 @@ class Toast extends React.Component<ToastProps, ToastState> {
 
     const startFadeIn = getSimpleFadeFunc(1);
 
-    const startFadeOut = getSimpleFadeFunc(0);
+    const startFadeOut = getSimpleFadeFunc(0, persistedTime);
 
-    startFadeIn(() => setTimeout(startFadeOut, persistedTime));
+    startFadeIn(() => startFadeOut());
   }
 
   show(msg: string = 'default msg', animationOption?: animationOption) {
