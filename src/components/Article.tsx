@@ -1,5 +1,5 @@
 import * as React from "react";
-import { View, Text, TouchableHighlight, RefreshControl, StyleSheet, ListView, Image, Dimensions } from 'react-native';
+import { View, Text, TouchableHighlight, RefreshControl, StyleSheet, ListView, Image, Dimensions, ActionSheetIOS } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 const events = require('RCTDeviceEventEmitter');
 import { DRAWER_CLOSED } from '../constants/eventTags';
@@ -45,6 +45,12 @@ const styles = StyleSheet.create({
     height: 200
   }
 });
+
+const actionSheetButtons = ['回应', '订阅', '举报', '取消'];
+const replyButtonIndex = 0;
+const subscribeButtonIndex = 1;
+const reportButtonIndex = 2;
+const cancelButtonIndex = 3;
 
 interface articleProps {
   articleList:any[];
@@ -119,6 +125,21 @@ class Article extends React.Component<articleProps, articleState> {
     });
   }
 
+  onLongPressPost() {
+    ActionSheetIOS.showActionSheetWithOptions({
+      options: actionSheetButtons,
+      cancelButtonIndex
+    }, (buttonIndex) => {
+      switch (buttonIndex) {
+        case replyButtonIndex : {
+          (Actions as any).replyForm({
+            title: '回应'
+          });
+        }
+      }
+    });
+  }
+
   onPressImageThumb(imageLink: string, imageExt: string) {
     const thumbUrl = API_GET_IMAGE_THUMB_URL(imageLink, imageExt);
 
@@ -156,6 +177,11 @@ class Article extends React.Component<articleProps, articleState> {
 
   renderPostData(postData: postData) {
 
+    const touchAbleAreaProps = {
+      onPress: () => this.onPressPost(postData),
+      onLongPress: () => this.onLongPressPost()
+    };
+
     const isAdmin = postData.admin === '1';
     const userIdStyle = [styles.rowInfoText, isAdmin ? {
       color: 'red'
@@ -163,7 +189,7 @@ class Article extends React.Component<articleProps, articleState> {
 
     return (
       <View style={styles.postRow}>
-        <TouchableHighlight onPress={() => this.onPressPost(postData)}>
+        <TouchableHighlight {...touchAbleAreaProps}>
           <View style={styles.postRowPress}>
             <View style={styles.postRowInfo}>
               <Text style={styles.rowInfoText}>

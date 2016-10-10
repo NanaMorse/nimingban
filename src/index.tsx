@@ -7,6 +7,7 @@ import Drawer from './components/Drawer';
 import ArticleContainer from './containers/ArticleContainer';
 import Post from './components/Post';
 import ImageViewer from './components/ImageViewer';
+import ReplyForm from './components/ReplyForm';
 
 import store from './store';
 
@@ -46,6 +47,11 @@ class App extends React.Component<any, any> {
       key: 'imageViewer',
       component: ImageViewer
     };
+
+    const replyFormSceneProps = {
+      key: 'replyForm',
+      component: ReplyForm
+    };
     
     return (
       <Provider store={store}>
@@ -58,6 +64,7 @@ class App extends React.Component<any, any> {
               </Scene>
               <Scene {...postSceneProps}/>
               <Scene {...imageViewerSceneProps}/>
+              <Scene {...replyFormSceneProps}/>
             </Scene>
           </RouterContainer>
       </Provider>

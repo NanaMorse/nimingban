@@ -11,7 +11,7 @@ class ReplyForm extends React.Component<any, any> {
 
   render() {
     return (
-      <View>
+      <View style={{flex: 1, marginTop: 64}}>
         <Text>I am Reply Form!</Text>
       </View>
     )
