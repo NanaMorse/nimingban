@@ -8,7 +8,7 @@ import PullUpListView from 'react-native-pull-up-listview';
 import Toast from './Toast';
 
 import ViewStyle = __React.ViewStyle;
-import { postData, replyData } from '../interface';
+import { postData, replyData, nmbActions } from '../interface';
 import ReactElement = __React.ReactElement;
 
 const styles = StyleSheet.create({
@@ -116,7 +116,7 @@ class Post extends React.Component<postProps, postState> {
     const thumbUrl = API_GET_IMAGE_THUMB_URL(imageLink, imageExt);
 
     Image.getSize(thumbUrl, function (width, height) {
-      (Actions as any).imageViewer({
+      (Actions as nmbActions).imageViewer({
         imageLink, imageExt, width, height,
         title: 'show Image'
       });
@@ -135,7 +135,6 @@ class Post extends React.Component<postProps, postState> {
       const ImageProps = {
         style: styles.rowImage,
         source: { uri: API_GET_IMAGE_THUMB_URL(imageLink, imageExt) },
-        //onLoad: this.onImageLoad.bind(this)
       };
 
       return (

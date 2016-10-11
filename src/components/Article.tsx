@@ -10,7 +10,7 @@ import PullUpListView from 'react-native-pull-up-listview';
 import ListViewDataSource = __React.ListViewDataSource;
 import ScrollViewStyle = __React.ScrollViewStyle;
 import ViewStyle = __React.ViewStyle;
-import { postData } from '../interface';
+import { postData, nmbActions } from '../interface';
 import ReactElement = __React.ReactElement;
 
 const styles = StyleSheet.create({
@@ -119,7 +119,7 @@ class Article extends React.Component<articleProps, articleState> {
   }
 
   onPressPost(postData) {
-    (Actions as any).post({
+    (Actions as nmbActions).post({
       postData,
       title: postData.id
     });
@@ -132,7 +132,7 @@ class Article extends React.Component<articleProps, articleState> {
     }, (buttonIndex) => {
       switch (buttonIndex) {
         case replyButtonIndex : {
-          (Actions as any).replyForm({
+          (Actions as nmbActions).replyForm({
             title: '回应'
           });
         }
@@ -144,7 +144,7 @@ class Article extends React.Component<articleProps, articleState> {
     const thumbUrl = API_GET_IMAGE_THUMB_URL(imageLink, imageExt);
 
     Image.getSize(thumbUrl, function (width, height) {
-      (Actions as any).imageViewer({
+      (Actions as nmbActions).imageViewer({
         imageLink, imageExt, width, height,
         title: 'Image'
       });

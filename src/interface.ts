@@ -1,3 +1,5 @@
+import * as RNRF from 'react-native-router-flux';
+
 export interface replyData {
   admin: '0' | '1',
   img: string;
@@ -14,4 +16,12 @@ export interface postData extends replyData {
   title: string;
   replyCount: string;
   replys: replyData[]
+}
+
+type props = Object;
+
+export interface nmbActions extends RNRF.RNRFActions {
+  replyForm(props: props): any
+  imageViewer(props: props): any
+  post(props: props): any
 }
