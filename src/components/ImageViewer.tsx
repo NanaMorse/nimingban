@@ -43,7 +43,7 @@ class ImageViewer extends React.Component<ImageViewerProps, ImageViewerState> {
 
     const imageStyle = {width: 0, height: 0};
 
-    if (width >= height) {
+    if (width >= height || imageAreaHeight * width / height > width) {
       imageStyle.width = imageAreaWidth;
       imageStyle.height = imageAreaWidth * height / width;
     } else {

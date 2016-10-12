@@ -125,7 +125,7 @@ class Article extends React.Component<articleProps, articleState> {
     });
   }
 
-  onLongPressPost() {
+  onLongPressPost(replyTo) {
     ActionSheetIOS.showActionSheetWithOptions({
       options: actionSheetButtons,
       cancelButtonIndex
@@ -133,7 +133,8 @@ class Article extends React.Component<articleProps, articleState> {
       switch (buttonIndex) {
         case replyButtonIndex : {
           (Actions as nmbActions).replyForm({
-            title: '回应'
+            title: `回应: ${replyTo}`,
+            replyTo
           });
         }
       }
@@ -179,7 +180,7 @@ class Article extends React.Component<articleProps, articleState> {
 
     const touchAbleAreaProps = {
       onPress: () => this.onPressPost(postData),
-      onLongPress: () => this.onLongPressPost()
+      onLongPress: () => this.onLongPressPost(postData.id)
     };
 
     const isAdmin = postData.admin === '1';

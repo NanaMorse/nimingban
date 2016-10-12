@@ -6,6 +6,7 @@ import { API_POST_REPLY } from '../constants/api';
 import TextInputProperties = __React.TextInputProperties;
 import ViewStyle = __React.ViewStyle;
 
+const myCookie = 'pgv_pvi=7859499008; userhash=v%5CUZ%DD%99%1F%22%DB%A0%9A%B9%F0f%7F%B0-%B78%A7%C8%8D%9E%09; PHPSESSID=5i6aat546n215nkipl3iji0n21; pgv_si=s497921024; _tc_iqsi5f1w_a=305431701.1476273774; _gat=1; _ga=GA1.2.1938008232.1474521214; Hm_lvt_f0fee27d995765b6fd4fc6aa45b0c668=1476151056,1476164222,1476185305,1476272083; Hm_lpvt_f0fee27d995765b6fd4fc6aa45b0c668=1476275774';
 
 const rowHeight = 40;
 
@@ -97,13 +98,18 @@ const Button = (props: ButtonProps) => {
   );
 };
 
+interface ReplyFormProps {
+  replyTo: number;
+}
+
 interface ReplyFormState {
   name?: string;
   email?: string;
   title?: string;
+  content?: string;
 }
 
-class ReplyForm extends React.Component<any, ReplyFormState> {
+class ReplyForm extends React.Component<ReplyFormProps, ReplyFormState> {
 
   constructor() {
     super();
@@ -111,7 +117,8 @@ class ReplyForm extends React.Component<any, ReplyFormState> {
     this.state = {
       name: '',
       email: '',
-      title: ''
+      title: '',
+      content: ''
     }
   }
 
@@ -126,9 +133,28 @@ class ReplyForm extends React.Component<any, ReplyFormState> {
   }
 
   onPostReply() {
-    console.log('post!');
+    const formData = new FormData();
+    formData.append('resto', this.props.replyTo);
+    formData.append('name', this.state.name);
+    formData.append('email', this.state.email);
+    formData.append('title', this.state.title);
+    formData.append('content', this.state.content);
+    // todo aad checkbox
+    formData.append('water', true);
+    // todo calculate hash
+    formData.append('__hash__', 'dd3633b139d37facad7721a6c0196de6_65efc949b810f8a50090369dd28a016d');
+    // todo add image uploader
 
-    Actions.pop();
+    fetch(API_POST_REPLY(), {
+      method: 'POST',
+      headers: {
+        "Content-Type": "multipart/form-data",
+        "Cookie": myCookie
+      },
+      body: formData
+    }).catch(function (e) {
+      console.log(e);
+    });
   }
 
   render() {
@@ -136,7 +162,13 @@ class ReplyForm extends React.Component<any, ReplyFormState> {
       multiline: true,
       autoCorrect: false,
       style: styles.replyEdit,
-      placeholder: '输入正文'
+      placeholder: '输入正文',
+      value: this.state.content,
+      onChange: (e) => {
+        this.setState({
+          'content': e.nativeEvent.text
+        });
+      }
     };
 
     return (
