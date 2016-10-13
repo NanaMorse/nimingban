@@ -1,5 +1,5 @@
 import * as React from "react";
-import { View, Text, TextInput, TouchableHighlight, StyleSheet, Image, Dimensions } from 'react-native';
+import { View, Text, TextInput, TouchableHighlight, StyleSheet, Image, Dimensions, Switch } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 
 import { API_POST_REPLY } from '../constants/api';
@@ -72,13 +72,17 @@ interface FormRowProps {
   onChange: ( event: {nativeEvent: {text: string}} ) => void
 }
 
-const FormRow = (props: FormRowProps) => {
+const FormInputRow = (props: FormRowProps) => {
   return (
     <View style={styles.formRow}>
       <Text style={styles.rowLabel}>{props.label}</Text>
       <TextInput autoCorrect={false} autoCapitalize="none" style={styles.rowInput} value={props.value} onChange={props.onChange}/>
     </View>
   );
+};
+
+const FormSwitchRow = (props) => {
+
 };
 
 interface ButtonProps {
@@ -122,14 +126,14 @@ class ReplyForm extends React.Component<ReplyFormProps, ReplyFormState> {
     }
   }
 
-  generateFormRow(label: string, valueHolder: string) {
+  generateFormInputRow(label: string, valueHolder: string) {
     const onChange = (e) => {
       this.setState({
         [valueHolder]: e.nativeEvent.text
       });
     };
 
-    return <FormRow label={label} value={this.state[valueHolder]} onChange={onChange}/>
+    return <FormInputRow label={label} value={this.state[valueHolder]} onChange={onChange}/>
   }
 
   onPostReply() {
@@ -174,9 +178,9 @@ class ReplyForm extends React.Component<ReplyFormProps, ReplyFormState> {
     return (
       <View style={styles.container}>
         <TextInput autoCapitalize="none" {...replyEditInputProps}/>
-        {this.generateFormRow('名称：', 'name')}
-        {this.generateFormRow('E-mail：', 'email')}
-        {this.generateFormRow('标题：', 'title')}
+        {this.generateFormInputRow('名称：', 'name')}
+        {this.generateFormInputRow('E-mail：', 'email')}
+        {this.generateFormInputRow('标题：', 'title')}
         <View style={{ marginVertical: 20 }}/>
         <Button text="提交" onPress={this.onPostReply.bind(this)}/>
       </View>
