@@ -46,11 +46,10 @@ const styles = StyleSheet.create({
   }
 });
 
-const actionSheetButtons = ['回应', '订阅', '举报', '取消'];
-const replyButtonIndex = 0;
-const subscribeButtonIndex = 1;
-const reportButtonIndex = 2;
-const cancelButtonIndex = 3;
+const actionSheetButtons = ['订阅', '举报', '取消'];
+const subscribeButtonIndex = 0;
+const reportButtonIndex = 1;
+const cancelButtonIndex = 2;
 
 interface articleProps {
   articleList:any[];
@@ -125,19 +124,12 @@ class Article extends React.Component<articleProps, articleState> {
     });
   }
 
-  onLongPressPost(replyTo) {
+  onLongPressPost() {
     ActionSheetIOS.showActionSheetWithOptions({
       options: actionSheetButtons,
       cancelButtonIndex
     }, (buttonIndex) => {
-      switch (buttonIndex) {
-        case replyButtonIndex : {
-          (Actions as nmbActions).replyForm({
-            title: `回应: ${replyTo}`,
-            replyTo
-          });
-        }
-      }
+      // todo: init subscribe and report
     });
   }
 
@@ -180,7 +172,7 @@ class Article extends React.Component<articleProps, articleState> {
 
     const touchAbleAreaProps = {
       onPress: () => this.onPressPost(postData),
-      onLongPress: () => this.onLongPressPost(postData.id)
+      onLongPress: () => this.onLongPressPost()
     };
 
     const isAdmin = postData.admin === '1';

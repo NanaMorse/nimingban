@@ -1,5 +1,5 @@
 import * as React from "react";
-import { View, Text, TouchableHighlight, RefreshControl, StyleSheet, ListView, Image, Dimensions } from 'react-native';
+import { View, Text, TouchableHighlight, RefreshControl, StyleSheet, ListView, Image, Dimensions, ActionSheetIOS } from 'react-native';
 import { API_GET_REPLY_LIST } from '../constants/api'
 import * as AppTools from '../appTools';
 import { API_GET_IMAGE_THUMB_URL } from '../constants/api'
@@ -18,8 +18,6 @@ const styles = StyleSheet.create({
 
   contentRow: {
     backgroundColor: '#fff',
-    marginLeft: 5,
-    marginRight: 5,
     padding: 10,
     borderBottomColor: '#e8e9ea',
     borderBottomWidth: 1,
@@ -41,6 +39,11 @@ const styles = StyleSheet.create({
     height: 200
   }
 });
+
+const actionSheetButtons = ['回应', '举报', '取消'];
+const replyButtonIndex = 0;
+const reportButtonIndex = 1;
+const cancelButtonIndex = 2;
 
 interface postProps {
   postData: postData;
@@ -101,8 +104,18 @@ class Post extends React.Component<postProps, postState> {
     });
   }
 
-  generateRefreshControl() {
-    return <RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh.bind(this)}/>
+  onLongPressReply(replyTo: string) {
+    ActionSheetIOS.showActionSheetWithOptions({
+      options: actionSheetButtons,
+      cancelButtonIndex
+    }, (buttonIndex) => {
+      // todo: init report
+      switch (buttonIndex) {
+        case replyButtonIndex : {
+          return this.showReplyPage(replyTo);
+        }
+      }
+    });
   }
 
   onLoadMore() {
@@ -123,6 +136,17 @@ class Post extends React.Component<postProps, postState> {
     }, function () {
       console.log('get Size failure:', thumbUrl)
     });
+  }
+
+  showReplyPage(replyTo: string) {
+    (Actions as nmbActions).replyForm({
+      title: `回应：${replyTo}`,
+      replyTo
+    });
+  }
+
+  generateRefreshControl() {
+    return <RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh.bind(this)}/>
   }
 
   renderImageThumb(imageLink: string, imageExt: string) {
@@ -160,19 +184,28 @@ class Post extends React.Component<postProps, postState> {
       color: 'red'
     } : null];
 
+    const touchableAreaProps = {
+      onLongPress: () => this.onLongPressReply(replayData.id),
+      style: {
+        marginHorizontal: 5
+      }
+    };
+
     return (
-      <View style={styles.contentRow}>
-        <View style={styles.contentRowInfo}>
-          <Text style={styles.rowInfoText}>
-            <Text style={userIdStyle}>{`${isPoReply ? `${replayData.userid}(PO)` : replayData.userid}`}</Text>
-            {` ${replayData.now}`}
-          </Text>
-          <Text style={styles.rowInfoText}>{`No：${replayData.id}`}</Text>
+      <TouchableHighlight {...touchableAreaProps}>
+        <View style={styles.contentRow}>
+          <View style={styles.contentRowInfo}>
+            <Text style={styles.rowInfoText}>
+              <Text style={userIdStyle}>{`${isPoReply ? `${replayData.userid}(PO)` : replayData.userid}`}</Text>
+              {` ${replayData.now}`}
+            </Text>
+            <Text style={styles.rowInfoText}>{`No：${replayData.id}`}</Text>
+          </View>
+          {AppTools.formatContent(replayData.content)}
+          <View style={ replayData.img ? {marginBottom: 10} : null }></View>
+          {this.renderImageThumb(replayData.img, replayData.ext)}
         </View>
-        {AppTools.formatContent(replayData.content)}
-        <View style={ replayData.img ? {marginBottom: 10} : null }></View>
-        {this.renderImageThumb(replayData.img, replayData.ext)}
-      </View>
+      </TouchableHighlight>
     )
   }
   

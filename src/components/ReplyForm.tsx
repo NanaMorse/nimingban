@@ -81,8 +81,19 @@ const FormInputRow = (props: FormRowProps) => {
   );
 };
 
-const FormSwitchRow = (props) => {
+interface FormSwitchProps {
+  label: string;
+  value: boolean;
+  onValueChange: (value: boolean) => void
+}
 
+const FormSwitchRow = (props: FormSwitchProps) => {
+  return (
+    <View style={styles.formRow}>
+      <Text style={styles.rowLabel}>{props.label}</Text>
+      <Switch value={props.value} onValueChange={props.onValueChange}/>
+    </View>
+  );
 };
 
 interface ButtonProps {
@@ -103,7 +114,7 @@ const Button = (props: ButtonProps) => {
 };
 
 interface ReplyFormProps {
-  replyTo: number;
+  replyTo: string;
 }
 
 interface ReplyFormState {
@@ -111,6 +122,7 @@ interface ReplyFormState {
   email?: string;
   title?: string;
   content?: string;
+  water?: boolean;
 }
 
 class ReplyForm extends React.Component<ReplyFormProps, ReplyFormState> {
@@ -122,7 +134,8 @@ class ReplyForm extends React.Component<ReplyFormProps, ReplyFormState> {
       name: '',
       email: '',
       title: '',
-      content: ''
+      content: '',
+      water: true
     }
   }
 
@@ -175,12 +188,21 @@ class ReplyForm extends React.Component<ReplyFormProps, ReplyFormState> {
       }
     };
 
+    const waterFromSwitchProps = {
+      label: '图片水印：',
+      value: this.state.water,
+      onValueChange: (value) => {
+        this.setState({ water: value })
+      }
+    };
+
     return (
       <View style={styles.container}>
         <TextInput autoCapitalize="none" {...replyEditInputProps}/>
         {this.generateFormInputRow('名称：', 'name')}
         {this.generateFormInputRow('E-mail：', 'email')}
         {this.generateFormInputRow('标题：', 'title')}
+        <FormSwitchRow {...waterFromSwitchProps}/>
         <View style={{ marginVertical: 20 }}/>
         <Button text="提交" onPress={this.onPostReply.bind(this)}/>
       </View>
