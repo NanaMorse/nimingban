@@ -47,6 +47,7 @@ const cancelButtonIndex = 2;
 
 interface postProps {
   postData: postData;
+  needRequest: boolean;
 }
 
 interface postState {
@@ -78,7 +79,13 @@ class Post extends React.Component<postProps, postState> {
   componentDidMount() {
     this.tryRequestReplys();
   }
-  
+
+  componentWillUpdate(props) {
+    if (props.needRequest) {
+      console.log('need to request for more reply');
+    }
+  }
+
   tryRequestReplys(page = 1, loadMore?) {
     return fetch(API_GET_REPLY_LIST(this.props.postData.id, page))
       .then(response => response.json())

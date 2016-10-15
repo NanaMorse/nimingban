@@ -1,6 +1,7 @@
 import * as React from "react";
 import { View, Text, TextInput, TouchableHighlight, StyleSheet, Image, Dimensions, Switch } from 'react-native';
 import { Actions } from 'react-native-router-flux';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import { API_POST_REPLY } from '../constants/api';
 import TextInputProperties = __React.TextInputProperties;
@@ -69,14 +70,14 @@ const styles = StyleSheet.create({
 interface FormRowProps {
   label: string;
   value: string;
-  onChange: ( event: {nativeEvent: {text: string}} ) => void
+  onChangeText: ( text: string ) => void
 }
 
 const FormInputRow = (props: FormRowProps) => {
   return (
     <View style={styles.formRow}>
       <Text style={styles.rowLabel}>{props.label}</Text>
-      <TextInput autoCorrect={false} autoCapitalize="none" style={styles.rowInput} value={props.value} onChange={props.onChange}/>
+      <TextInput autoCorrect={false} autoCapitalize="none" style={styles.rowInput} value={props.value} onChangeText={props.onChangeText}/>
     </View>
   );
 };
@@ -123,6 +124,7 @@ interface ReplyFormState {
   title?: string;
   content?: string;
   water?: boolean;
+  showMore?: boolean;
 }
 
 class ReplyForm extends React.Component<ReplyFormProps, ReplyFormState> {
@@ -135,18 +137,19 @@ class ReplyForm extends React.Component<ReplyFormProps, ReplyFormState> {
       email: '',
       title: '',
       content: '',
-      water: true
+      water: true,
+      showMore: false
     }
   }
 
   generateFormInputRow(label: string, valueHolder: string) {
-    const onChange = (e) => {
+    const onChangeText = (text) => {
       this.setState({
-        [valueHolder]: e.nativeEvent.text
+        [valueHolder]: text
       });
     };
 
-    return <FormInputRow label={label} value={this.state[valueHolder]} onChange={onChange}/>
+    return <FormInputRow label={label} value={this.state[valueHolder]} onChangeText={onChangeText}/>
   }
 
   onPostReply() {
@@ -156,8 +159,7 @@ class ReplyForm extends React.Component<ReplyFormProps, ReplyFormState> {
     formData.append('email', this.state.email);
     formData.append('title', this.state.title);
     formData.append('content', this.state.content);
-    // todo aad checkbox
-    formData.append('water', true);
+    formData.append('water', this.state.water);
     // todo calculate hash
     formData.append('__hash__', 'dd3633b139d37facad7721a6c0196de6_65efc949b810f8a50090369dd28a016d');
     // todo add image uploader
@@ -169,9 +171,10 @@ class ReplyForm extends React.Component<ReplyFormProps, ReplyFormState> {
         "Cookie": myCookie
       },
       body: formData
-    }).catch(function (e) {
-      console.log(e);
-    });
+    }).then(() => {
+      Actions.pop();
+      setTimeout(() => Actions.refresh({ key: 'post', needRequest: true }), 1);
+    }).catch(e => console.error(e));
   }
 
   render() {
@@ -181,14 +184,14 @@ class ReplyForm extends React.Component<ReplyFormProps, ReplyFormState> {
       style: styles.replyEdit,
       placeholder: '输入正文',
       value: this.state.content,
-      onChange: (e) => {
+      onChangeText: (text) => {
         this.setState({
-          'content': e.nativeEvent.text
+          'content': text
         });
       }
     };
 
-    const waterFromSwitchProps = {
+    const waterFormSwitchProps = {
       label: '图片水印：',
       value: this.state.water,
       onValueChange: (value) => {
@@ -196,16 +199,30 @@ class ReplyForm extends React.Component<ReplyFormProps, ReplyFormState> {
       }
     };
 
+    const showMoreFormSwitchProps = {
+      label: '更多选项：',
+      value: this.state.showMore,
+      onValueChange: (value) => {
+        this.setState({ showMore: value })
+      }
+    };
+
     return (
-      <View style={styles.container}>
-        <TextInput autoCapitalize="none" {...replyEditInputProps}/>
-        {this.generateFormInputRow('名称：', 'name')}
-        {this.generateFormInputRow('E-mail：', 'email')}
-        {this.generateFormInputRow('标题：', 'title')}
-        <FormSwitchRow {...waterFromSwitchProps}/>
-        <View style={{ marginVertical: 20 }}/>
-        <Button text="提交" onPress={this.onPostReply.bind(this)}/>
-      </View>
+      <KeyboardAwareScrollView resetScrollToCoords={ {x: 0, y: 0} }>
+        <View style={styles.container}>
+          <TextInput autoCapitalize="none" {...replyEditInputProps}/>
+          <FormSwitchRow {...waterFormSwitchProps}/>
+          <FormSwitchRow {...showMoreFormSwitchProps}/>
+          { this.state.showMore ?
+            <View>
+            {this.generateFormInputRow('名称：', 'name')}
+            {this.generateFormInputRow('E-mail：', 'email')}
+            {this.generateFormInputRow('标题：', 'title')}
+            </View> : null }
+          <View style={{ marginVertical: 20 }}/>
+          <Button text="提交" onPress={this.onPostReply.bind(this)}/>
+        </View>
+      </KeyboardAwareScrollView>
     )
   }
 }
