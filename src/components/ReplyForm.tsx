@@ -1,7 +1,8 @@
 import * as React from "react";
 import { View, Text, TextInput, TouchableHighlight, StyleSheet, Image, Dimensions, Switch } from 'react-native';
 import { Actions } from 'react-native-router-flux';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import * as ImagePicker from 'react-native-image-picker';
 
 import { API_POST_REPLY } from '../constants/api';
 import TextInputProperties = __React.TextInputProperties;
@@ -14,7 +15,8 @@ const rowHeight = 40;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 74,
+    marginTop: 64,
+    marginBottom: 10,
     marginHorizontal: 10
   },
 
@@ -25,6 +27,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     paddingVertical: 5,
     paddingHorizontal: 10,
+    marginVertical: 10,
     fontSize: 16
   },
 
@@ -52,13 +55,21 @@ const styles = StyleSheet.create({
   button: {
     width: Dimensions.get('window').width - 20,
     height: rowHeight,
-    backgroundColor: '#428bca',
-    borderColor: '#357ebd',
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
-    borderRadius: 6
+    borderRadius: 6,
   } as ViewStyle,
+
+  primaryBtn: {
+    backgroundColor: '#428bca',
+    borderColor: '#357ebd',
+  },
+
+  infoBtn: {
+    backgroundColor: '#5bc0de',
+    borderColor: '#46b8da',
+  },
 
   buttonText: {
     color: '#fff',
@@ -99,14 +110,18 @@ const FormSwitchRow = (props: FormSwitchProps) => {
 
 interface ButtonProps {
   text: string,
-  onPress: () => void
+  onPress: () => void,
+  type?: 'primary' | 'info'
 }
 
 const Button = (props: ButtonProps) => {
+
+  const buttonStyle = [styles.button, styles[(props.type || 'primary') + 'Btn']];
+
   return (
     <View style={{flex: 1, alignItems: 'center'}}>
       <TouchableHighlight style={{borderRadius: 6}} onPress={props.onPress}>
-        <View style={styles.button}>
+        <View style={buttonStyle}>
           <Text style={styles.buttonText}>{props.text}</Text>
         </View>
       </TouchableHighlight>
@@ -118,26 +133,39 @@ interface ReplyFormProps {
   replyTo: string;
 }
 
+interface imageInfo {
+  uri: string;
+  width: number;
+  height: number;
+}
+
 interface ReplyFormState {
   name?: string;
   email?: string;
   title?: string;
   content?: string;
   water?: boolean;
+  imageInfo?: imageInfo;
   showMore?: boolean;
 }
 
 class ReplyForm extends React.Component<ReplyFormProps, ReplyFormState> {
 
-  constructor() {
+  constructor(props) {
     super();
 
     this.state = {
       name: '',
       email: '',
       title: '',
-      content: '',
+      // todo reply to the post, or reply to another reply
+      content: `>>No.${props.replyTo}`,
       water: true,
+      imageInfo: {
+        uri: '',
+        width: 0,
+        height: 0
+      },
       showMore: false
     }
   }
@@ -152,6 +180,32 @@ class ReplyForm extends React.Component<ReplyFormProps, ReplyFormState> {
     return <FormInputRow label={label} value={this.state[valueHolder]} onChangeText={onChangeText}/>
   }
 
+  generateImageRow(imageInfo: imageInfo) {
+
+    const { width, height, uri } = imageInfo;
+    const windowWidth = Dimensions.get('window').width;
+
+    const imageAreaWidth = windowWidth - 20;
+    const imageAreaHeight = 200;
+
+    const imageStyle = {width: 0, height: 0};
+
+    if (width >= height || imageAreaHeight * width / height > width) {
+      imageStyle.width = imageAreaWidth;
+      imageStyle.height = imageAreaWidth * height / width;
+    } else {
+      imageStyle.width = imageAreaHeight * width / height;
+      imageStyle.height = imageAreaHeight;
+    }
+
+    const imageProps = {
+      style: [imageStyle, { marginVertical: 10 }],
+      source: { uri }
+    };
+
+    return <Image {...imageProps}/>
+  }
+
   onPostReply() {
     const formData = new FormData();
     formData.append('resto', this.props.replyTo);
@@ -163,6 +217,13 @@ class ReplyForm extends React.Component<ReplyFormProps, ReplyFormState> {
     // todo calculate hash
     formData.append('__hash__', 'dd3633b139d37facad7721a6c0196de6_65efc949b810f8a50090369dd28a016d');
     // todo add image uploader
+    if (this.state.imageInfo.uri) {
+      formData.append('image', {
+        uri: this.state.imageInfo.uri,
+        type: 'image/png',
+        name: 'a.png',
+      });
+    }
 
     fetch(API_POST_REPLY(), {
       method: 'POST',
@@ -175,6 +236,34 @@ class ReplyForm extends React.Component<ReplyFormProps, ReplyFormState> {
       Actions.pop();
       setTimeout(() => Actions.refresh({ key: 'post', needRequest: true }), 1);
     }).catch(e => console.error(e));
+  }
+
+  onChoiceImage() {
+    var options = {
+      title: '选择图片',
+      storageOptions: {
+        skipBackup: true,
+        path: 'images'
+      }
+    };
+
+    ImagePicker.showImagePicker(options, (response) => {
+
+      if (response.didCancel) return;
+
+      if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+        return;
+      }
+
+      this.setState({
+        imageInfo: {
+          uri: response.uri.replace('file://', ''),
+          width: response.width,
+          height: response.height
+        }
+      });
+    });
   }
 
   render() {
@@ -208,9 +297,14 @@ class ReplyForm extends React.Component<ReplyFormProps, ReplyFormState> {
     };
 
     return (
-      <KeyboardAwareScrollView resetScrollToCoords={ {x: 0, y: 0} }>
+      // todo fix KeyboardAwareScrollView's bug about 20px's marginTop
+      <KeyboardAwareScrollView>
         <View style={styles.container}>
           <TextInput autoCapitalize="none" {...replyEditInputProps}/>
+          {
+            this.state.imageInfo.uri ? this.generateImageRow(this.state.imageInfo) : null
+          }
+          <Button text="选择图片" type="info" onPress={this.onChoiceImage.bind(this)}/>
           <FormSwitchRow {...waterFormSwitchProps}/>
           <FormSwitchRow {...showMoreFormSwitchProps}/>
           { this.state.showMore ?
