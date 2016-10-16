@@ -8,7 +8,9 @@ import {
   Text,
   TouchableHighlight
 } from 'react-native';
-import { Actions } from 'react-native-router-flux'; 
+import { Actions } from 'react-native-router-flux';
+
+const HTMLView = require('react-native-htmlview');
 
 import ViewStyle = __React.ViewStyle;
 import TextStyle = __React.TextStyle;
@@ -101,6 +103,7 @@ const SideMenuHeader = () => {
 
 interface ForumInfo {
   name: string;
+  showName: string;
 }
 
 interface ForumListInfo {
@@ -112,7 +115,7 @@ let onCheckoutDispatch;
 
 const SubListWrapper = (props) => {
 
-  const listItems = props.forums.map((forumInfo, index) => {
+  const listItems = props.forums.map((forumInfo: ForumInfo, index) => {
 
     const onPress = () => {
       Actions.refresh({key: 'drawer', open: false});
@@ -122,7 +125,9 @@ const SubListWrapper = (props) => {
     return (
       <TouchableHighlight key={index} onPress={onPress}>
         <View style={props.listItemStyle}>
-          <Text style={styles.subListItemText}>{forumInfo.name}</Text>
+          <Text style={styles.subListItemText}>
+            <HTMLView value={forumInfo.showName || forumInfo.name}/>
+          </Text>
         </View>
       </TouchableHighlight>
     );

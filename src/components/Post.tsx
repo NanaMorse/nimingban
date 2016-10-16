@@ -6,6 +6,7 @@ import { API_GET_IMAGE_THUMB_URL } from '../constants/api'
 import { Actions } from 'react-native-router-flux';
 import PullUpListView from 'react-native-pull-up-listview';
 import Toast from './Toast';
+const HTMLView = require('react-native-htmlview');
 
 import ViewStyle = __React.ViewStyle;
 import { postData, replyData, nmbActions } from '../interface';
@@ -208,7 +209,7 @@ class Post extends React.Component<postProps, postState> {
             </Text>
             <Text style={styles.rowInfoText}>{`No：${replayData.id}`}</Text>
           </View>
-          {AppTools.formatContent(replayData.content)}
+          <HTMLView value={replayData.content}/>
           <View style={ replayData.img ? {marginBottom: 10} : null }></View>
           {this.renderImageThumb(replayData.img, replayData.ext)}
         </View>

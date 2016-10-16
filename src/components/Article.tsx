@@ -6,6 +6,7 @@ import { DRAWER_CLOSED } from '../constants/eventTags';
 import * as AppTools from '../appTools';
 import { API_GET_IMAGE_THUMB_URL } from '../constants/api';
 import PullUpListView from 'react-native-pull-up-listview';
+const HTMLView = require('react-native-htmlview');
 
 import ListViewDataSource = __React.ListViewDataSource;
 import ScrollViewStyle = __React.ScrollViewStyle;
@@ -191,7 +192,7 @@ class Article extends React.Component<articleProps, articleState> {
               </Text>
               <Text style={styles.rowInfoText}>{`reply：${postData.replyCount}`}</Text>
             </View>
-            {AppTools.formatContent(postData.content)}
+            <HTMLView value={postData.content}/>
             <View style={ postData.img ? {marginBottom: 10} : null }></View>
             {this.renderImageThumb(postData.img, postData.ext)}
           </View>
