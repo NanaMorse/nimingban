@@ -4,6 +4,8 @@ import { Actions } from 'react-native-router-flux';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import * as ImagePicker from 'react-native-image-picker';
 
+import { getImageSuitableSize } from '../appTools';
+
 import { API_POST_REPLY } from '../constants/api';
 import TextInputProperties = __React.TextInputProperties;
 import ViewStyle = __React.ViewStyle;
@@ -181,26 +183,16 @@ class ReplyForm extends React.Component<ReplyFormProps, ReplyFormState> {
   }
 
   generateImageRow(imageInfo: imageInfo) {
+    const containerSize = {
+      width: Dimensions.get('window').width - 20,
+      height: 200
+    };
 
-    const { width, height, uri } = imageInfo;
-    const windowWidth = Dimensions.get('window').width;
-
-    const imageAreaWidth = windowWidth - 20;
-    const imageAreaHeight = 200;
-
-    const imageStyle = {width: 0, height: 0};
-
-    if (width >= height || imageAreaHeight * width / height > width) {
-      imageStyle.width = imageAreaWidth;
-      imageStyle.height = imageAreaWidth * height / width;
-    } else {
-      imageStyle.width = imageAreaHeight * width / height;
-      imageStyle.height = imageAreaHeight;
-    }
+    const imageSize = getImageSuitableSize(imageInfo, containerSize);
 
     const imageProps = {
-      style: [imageStyle, { marginVertical: 10 }],
-      source: { uri }
+      style: [imageSize, { marginBottom: 10 }],
+      source: { uri: imageInfo.uri }
     };
 
     return <Image {...imageProps}/>

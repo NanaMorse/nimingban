@@ -1,9 +1,10 @@
 import * as React from "react";
 import { View, Image, StyleSheet, Dimensions } from 'react-native';
 import { API_GET_IMAGE_FULL_URL } from '../constants/api';
-import ViewStyle = __React.ViewStyle;
 
-const RCTImageStoreManager = require('NativeModules').ImageStoreManager;
+import { getImageSuitableSize } from '../appTools';
+
+import ViewStyle = __React.ViewStyle;
 
 const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
 
@@ -30,29 +31,21 @@ interface ImageViewerState {
 }
 
 class ImageViewer extends React.Component<ImageViewerProps, ImageViewerState> {
-  constructor(props) {
+  constructor() {
     super();
   }
 
   render() {
 
-    const { width, height } = this.props;
+    const containerSize = {
+      width: windowWidth,
+      height: windowHeight - 64
+    };
 
-    const imageAreaWidth = windowWidth;
-    const imageAreaHeight = windowHeight - 64;
-
-    const imageStyle = {width: 0, height: 0};
-
-    if (width >= height || imageAreaHeight * width / height > width) {
-      imageStyle.width = imageAreaWidth;
-      imageStyle.height = imageAreaWidth * height / width;
-    } else {
-      imageStyle.width = imageAreaHeight * width / height;
-      imageStyle.height = imageAreaHeight;
-    }
+    const imageSize = getImageSuitableSize(this.props, containerSize);
 
     const imageProps = {
-      style: imageStyle,
+      style: imageSize,
       source: { uri: API_GET_IMAGE_FULL_URL(this.props.imageLink, this.props.imageExt) }
     };
 

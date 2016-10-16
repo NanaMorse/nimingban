@@ -8,6 +8,17 @@ const styles = StyleSheet.create({
   }
 });
 
+function replaceStringToTextComponentsArray(str: string | any[], reg: RegExp, fn?: Function) {
+
+  const resultArray: any[] = typeof str === 'string' ? str.split(reg) : str;
+
+  for (let i = 1, len = resultArray.length; i < len; i += 2) {
+    resultArray[i] = fn(resultArray[i], i)
+  }
+
+  return resultArray;
+}
+
 export function formatContent(content: string) {
   // remove <br />
   // todo how about user's input <br/> ?
@@ -32,14 +43,26 @@ export function formatContent(content: string) {
   );
 }
 
+interface size {
+  width: number;
+  height: number;
+}
 
-function replaceStringToTextComponentsArray(str: string | any[], reg: RegExp, fn?: Function) {
+export function getImageSuitableSize(imageOriginSize: size, containerSize: size): size {
 
-  const resultArray: any[] = typeof str === 'string' ? str.split(reg) : str;
+  const { width: originWidth, height: originHeight } = imageOriginSize;
 
-  for (let i = 1, len = resultArray.length; i < len; i += 2) {
-    resultArray[i] = fn(resultArray[i], i)
+  const { width: containerWidth, height: containerHeight } = containerSize;
+
+  const suitableSize = {width: 0, height: 0};
+
+  if (originWidth >= originHeight || containerHeight * originWidth / originHeight > originWidth) {
+    suitableSize.width = containerWidth;
+    suitableSize.height = containerWidth * originHeight / originWidth;
+  } else {
+    suitableSize.width = containerHeight * originWidth / originHeight;
+    suitableSize.height = containerHeight;
   }
-  
-  return resultArray;
+
+  return suitableSize;
 }
