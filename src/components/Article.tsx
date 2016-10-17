@@ -1,5 +1,5 @@
 import * as React from "react";
-import { View, Text, TouchableHighlight, RefreshControl, StyleSheet, ListView, Image, Dimensions, ActionSheetIOS } from 'react-native';
+import { View, Text, TouchableHighlight, RefreshControl, StyleSheet, ListView, Image, Dimensions, ActionSheetIOS, Linking } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 const events = require('RCTDeviceEventEmitter');
 import { DRAWER_CLOSED } from '../constants/eventTags';
@@ -169,8 +169,21 @@ class Article extends React.Component<articleProps, articleState> {
     }
   }
 
-  renderPostData(postData: postData) {
+  renderContent(content: string) {
+    const props = {
+      value: AppTools.formatContent(content),
+      stylesheet: AppTools.htmlContentStyles,
+      onLinkPress: (href) => {
+        Linking.canOpenURL(href).then((res) => {
+          if (res) Linking.openURL(href);
+        }).catch(e => console.log(e));
+      }
+    };
 
+    return <HTMLView {...props}/>
+  }
+
+  renderPostData(postData: postData) {
     const touchAbleAreaProps = {
       onPress: () => this.onPressPost(postData),
       onLongPress: () => this.onLongPressPost()
@@ -192,7 +205,7 @@ class Article extends React.Component<articleProps, articleState> {
               </Text>
               <Text style={styles.rowInfoText}>{`reply：${postData.replyCount}`}</Text>
             </View>
-            <HTMLView value={postData.content}/>
+            {this.renderContent(postData.content)}
             <View style={ postData.img ? {marginBottom: 10} : null }></View>
             {this.renderImageThumb(postData.img, postData.ext)}
           </View>

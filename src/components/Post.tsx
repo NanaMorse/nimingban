@@ -1,5 +1,5 @@
 import * as React from "react";
-import { View, Text, TouchableHighlight, RefreshControl, StyleSheet, ListView, Image, Dimensions, ActionSheetIOS } from 'react-native';
+import { View, Text, TouchableHighlight, RefreshControl, StyleSheet, ListView, Image, Dimensions, ActionSheetIOS, Linking } from 'react-native';
 import { API_GET_REPLY_LIST } from '../constants/api'
 import * as AppTools from '../appTools';
 import { API_GET_IMAGE_THUMB_URL } from '../constants/api'
@@ -179,6 +179,19 @@ class Post extends React.Component<postProps, postState> {
     }
   }
 
+  renderContent(content: string) {
+    const props = {
+      value: AppTools.formatContent(content),
+      stylesheet: AppTools.htmlContentStyles,
+      onLinkPress: (href) => {
+        Linking.canOpenURL(href).then((res) => {
+          if (res) Linking.openURL(href);
+        }).catch(e => console.log(e));
+      }
+    };
+
+    return <HTMLView {...props}/>
+  }
 
   renderReplyData(replayData: replyData) {
 
@@ -209,7 +222,7 @@ class Post extends React.Component<postProps, postState> {
             </Text>
             <Text style={styles.rowInfoText}>{`No：${replayData.id}`}</Text>
           </View>
-          <HTMLView value={replayData.content}/>
+          {this.renderContent(replayData.content)}
           <View style={ replayData.img ? {marginBottom: 10} : null }></View>
           {this.renderImageThumb(replayData.img, replayData.ext)}
         </View>
