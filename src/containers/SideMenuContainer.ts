@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import SideMenu from '../components/SideMenu';
+import SideMenu from '../components/Drawer/SideMenu';
 import * as Actions from '../actions';
 
 function mapStateToProps(state) {

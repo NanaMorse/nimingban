@@ -5,7 +5,7 @@ import * as AppTools from '../appTools';
 import { API_GET_IMAGE_THUMB_URL } from '../constants/api'
 import { Actions } from 'react-native-router-flux';
 import PullUpListView from 'react-native-pull-up-listview';
-import Toast from './Toast';
+import Toast from './tools/Toast';
 const HTMLView = require('react-native-htmlview');
 
 import ViewStyle = __React.ViewStyle;

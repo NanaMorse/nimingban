@@ -5,6 +5,7 @@ const events = require('RCTDeviceEventEmitter');
 import { DRAWER_CLOSED } from '../constants/eventTags';
 import * as AppTools from '../appTools';
 import { API_GET_IMAGE_THUMB_URL } from '../constants/api';
+import LoadingCover from './tools/LoadingCover';
 import PullUpListView from 'react-native-pull-up-listview';
 const HTMLView = require('react-native-htmlview');
 
@@ -80,6 +81,7 @@ class Article extends React.Component<articleProps, articleState> {
   }
 
   componentDidMount() {
+    (Actions as nmbActions).loadingCover({ show: false });
     this.props.tryRequestArticleList(this.props.forumInfo.id);
   }
 

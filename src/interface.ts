@@ -24,4 +24,5 @@ export interface nmbActions extends RNRF.RNRFActions {
   replyForm(props: props): any
   imageViewer(props: props): any
   post(props: props): any
+  loadingCover(props: props): any
 }

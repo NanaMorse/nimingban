@@ -1,8 +1,8 @@
 import * as React from "react";
 import { View, Image, StyleSheet, Dimensions } from 'react-native';
-import { API_GET_IMAGE_FULL_URL } from '../constants/api';
+import { API_GET_IMAGE_FULL_URL } from '../../constants/api';
 
-import { getImageSuitableSize } from '../appTools';
+import { getImageSuitableSize } from '../../appTools';
 
 import ViewStyle = __React.ViewStyle;
 

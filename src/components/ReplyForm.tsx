@@ -210,21 +210,26 @@ class ReplyForm extends React.Component<ReplyFormProps, ReplyFormState> {
     formData.append('__hash__', 'dd3633b139d37facad7721a6c0196de6_65efc949b810f8a50090369dd28a016d');
     // todo add image uploader
     if (this.state.imageInfo.uri) {
+
       formData.append('image', {
         uri: this.state.imageInfo.uri,
-        type: 'image/png',
-        name: 'a.png',
+        type: 'image/jpeg',
+        name: 'a.jpg',
       });
     }
+
+    // show loading cover
+    Actions.refresh({ key: 'loadingCover', show: true });
 
     fetch(API_POST_REPLY(), {
       method: 'POST',
       headers: {
-        "Content-Type": "multipart/form-data",
+        "Content-Type": 'multipart/form-data',
         "Cookie": myCookie
       },
       body: formData
     }).then(() => {
+      Actions.refresh({ key: 'loadingCover', show: false });
       Actions.pop();
       setTimeout(() => Actions.refresh({ key: 'post', needRequest: true }), 1);
     }).catch(e => console.error(e));
