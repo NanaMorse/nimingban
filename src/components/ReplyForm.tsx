@@ -218,8 +218,8 @@ class ReplyForm extends React.Component<ReplyFormProps, ReplyFormState> {
       });
     }
 
-    // show loading cover
-    Actions.refresh({ key: 'loadingCover', show: true });
+    // todo show loading cover, there is some bug about rnrf
+    // Actions.refresh({ key: 'loadingCover', show: true });
 
     fetch(API_POST_REPLY(), {
       method: 'POST',
@@ -229,15 +229,22 @@ class ReplyForm extends React.Component<ReplyFormProps, ReplyFormState> {
       },
       body: formData
     }).then(() => {
-      Actions.refresh({ key: 'loadingCover', show: false });
       Actions.pop();
-      setTimeout(() => Actions.refresh({ key: 'post', needRequest: true }), 1);
+      setTimeout(() =>{
+        // Actions.refresh({ key: 'loadingCover', show: false });
+        Actions.refresh({ key: 'post', needRequest: true })
+      }, 1);
     }).catch(e => console.error(e));
   }
 
   onChoiceImage() {
     var options = {
       title: '选择图片',
+      cancelButtonTitle: '取消',
+      takePhotoButtonTitle: '拍照上传',
+      chooseFromLibraryButtonTitle: '从图库选择',
+      maxWidth: 1800,
+      noData: true,
       storageOptions: {
         skipBackup: true,
         path: 'images'
