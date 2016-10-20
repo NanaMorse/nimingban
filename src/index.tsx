@@ -1,4 +1,4 @@
- import * as React from "react";
+import * as React from "react";
 import { Provider } from 'react-redux';
 import { Scene, Modal } from 'react-native-router-flux';
 
@@ -10,7 +10,7 @@ import ReplyForm from './components/ReplyForm';
 import ImageViewer from './components/tools/ImageViewer';
 import LoadingCover from './components/tools/LoadingCover';
 
- import store from './store';
+import store from './store';
 
 class App extends React.Component<any, any> {
   constructor() {

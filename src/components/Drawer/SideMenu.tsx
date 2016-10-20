@@ -234,6 +234,18 @@ class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
   render() {
     const forumList = this.props.forumList;
 
+    const functionsList = {
+      name: '功能',
+      forums: [
+        {
+          name: "订阅",
+          showName: "订阅"
+        }
+      ]
+    };
+
+    forumList.push(functionsList);
+
     return (
       <View style={styles.container}>
         <View style={styles.sideMenu}>
