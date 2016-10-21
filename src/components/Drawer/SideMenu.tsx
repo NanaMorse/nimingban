@@ -9,6 +9,7 @@ import {
   TouchableHighlight
 } from 'react-native';
 import { Actions } from 'react-native-router-flux';
+import * as functionForumsId from '../../constants/functionForumsId';
 
 const HTMLView = require('react-native-htmlview');
 
@@ -19,6 +20,18 @@ import TextStyle = __React.TextStyle;
 const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
 
 const animateDuration = 500;
+
+const functionForums = {
+  name: '功能',
+  forums: [
+    // subscribe
+    {
+      id: functionForumsId.SUBSCRIBE_ID,
+      name: "订阅",
+      showName: "订阅"
+    }
+  ]
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -230,21 +243,10 @@ class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
     onCheckoutDispatch = this.props.checkoutForumList;
   }
 
-
   render() {
     const forumList = this.props.forumList;
 
-    const functionsList = {
-      name: '功能',
-      forums: [
-        {
-          name: "订阅",
-          showName: "订阅"
-        }
-      ]
-    };
-
-    forumList.push(functionsList);
+    forumList.push(functionForums);
 
     return (
       <View style={styles.container}>

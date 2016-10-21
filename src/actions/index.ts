@@ -1,5 +1,6 @@
 import * as Types from '../constants/actionTypes';
 import * as Api from '../constants/api';
+import * as functionForumsId from '../constants/functionForumsId'
 
 function requestForumList() {
   return {
@@ -49,10 +50,23 @@ function receiveArticleList(articleList, isLoadMore) {
   }
 }
 
+const testUUID = 'morse';
+
 export function tryRequestArticleList(id, page = 1, isLoadMore) {
 
   return function (dispatch) {
     dispatch(requestArticleList());
+
+    let fetchUrl = Api.API_GET_ARTICLE_LIST(id, page);
+
+    if (id in functionForumsId) {
+      switch (id) {
+        case functionForumsId.SUBSCRIBE_ID : {
+          fetchUrl = Api.API_QUERY_FEED(testUUID, page);
+          break;
+        }
+      }
+    }
 
     return fetch(Api.API_GET_ARTICLE_LIST(id, page))
       .then(response => response.json())

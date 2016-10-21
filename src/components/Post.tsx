@@ -58,7 +58,7 @@ interface postState {
   replys?: replyData[];
   currentPage?: number;
 
-  toastRef?: Toast
+  toastRef?: Toast;
 }
 
 class Post extends React.Component<postProps, postState> {

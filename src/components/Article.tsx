@@ -4,16 +4,18 @@ import { Actions } from 'react-native-router-flux';
 const events = require('RCTDeviceEventEmitter');
 import { DRAWER_CLOSED } from '../constants/eventTags';
 import * as AppTools from '../appTools';
-import { API_GET_IMAGE_THUMB_URL } from '../constants/api';
+import { API_GET_IMAGE_THUMB_URL, API_ADD_FEED } from '../constants/api';
 import LoadingCover from './tools/LoadingCover';
 import PullUpListView from 'react-native-pull-up-listview';
 const HTMLView = require('react-native-htmlview');
+import Toast from './tools/Toast';
 
 import ListViewDataSource = __React.ListViewDataSource;
 import ScrollViewStyle = __React.ScrollViewStyle;
 import ViewStyle = __React.ViewStyle;
 import { postData, nmbActions } from '../interface';
 import ReactElement = __React.ReactElement;
+
 
 const styles = StyleSheet.create({
   listView: {
@@ -65,7 +67,8 @@ interface articleState {
   dataSource?: ListViewDataSource;
   refreshing?: boolean;
   loading?: boolean;
-  _listView_ref?: any
+  listViewRef?: any;
+  toastRef?: Toast;
 }
 
 class Article extends React.Component<articleProps, articleState> {
@@ -91,7 +94,7 @@ class Article extends React.Component<articleProps, articleState> {
       
       events.addListener(DRAWER_CLOSED, () => {
         this.props.tryRequestArticleList(props.forumInfo.id)
-          .then(() => this.state._listView_ref.scrollTo({ y: 0, animated: false }));
+          .then(() => this.state.listViewRef.scrollTo({ y: 0, animated: false }));
         events.removeAllListeners(DRAWER_CLOSED);
       });
     }
@@ -127,13 +130,28 @@ class Article extends React.Component<articleProps, articleState> {
     });
   }
 
-  onLongPressPost() {
+  onLongPressPost(postData: postData) {
     ActionSheetIOS.showActionSheetWithOptions({
       options: actionSheetButtons,
       cancelButtonIndex
     }, (buttonIndex) => {
       // todo: init subscribe and report
+      switch (buttonIndex) {
+        case subscribeButtonIndex: {
+          return this.onAddFeed(postData.id);
+        }
+      }
     });
+  }
+
+  onAddFeed(tid) {
+    const testUUID = 'morse';
+
+    // todo handle add feed failed scene
+    fetch(API_ADD_FEED(testUUID, tid))
+      .then(response => {
+        this.state.toastRef.show('订阅大成功！');
+      });
   }
 
   onPressImageThumb(imageLink: string, imageExt: string) {
@@ -188,7 +206,7 @@ class Article extends React.Component<articleProps, articleState> {
   renderPostData(postData: postData) {
     const touchAbleAreaProps = {
       onPress: () => this.onPressPost(postData),
-      onLongPress: () => this.onLongPressPost()
+      onLongPress: () => this.onLongPressPost(postData)
     };
 
     const isAdmin = postData.admin === '1';
@@ -205,7 +223,7 @@ class Article extends React.Component<articleProps, articleState> {
                 <Text style={userIdStyle}>{`${postData.userid}`}</Text>
                 {` ${postData.now}`}
               </Text>
-              <Text style={styles.rowInfoText}>{`reply：${postData.replyCount}`}</Text>
+              {(postData.replyCount != null) ? <Text style={styles.rowInfoText}>{`reply：${postData.replyCount}`}</Text> : null}
             </View>
             {this.renderContent(postData.content)}
             <View style={ postData.img ? {marginBottom: 10} : null }></View>
@@ -215,6 +233,7 @@ class Article extends React.Component<articleProps, articleState> {
       </View>
     );
   }
+
 
   onLoadMore() {
     this.setState({loading: true});
@@ -231,14 +250,17 @@ class Article extends React.Component<articleProps, articleState> {
       renderRow: this.renderPostData.bind(this),
       refreshControl: this.generateRefreshControl(),
       style: styles.listView,
-      ref: (listView) => { this.state._listView_ref = listView; },
+      ref: (listView) => { this.state.listViewRef = listView; },
       loading: this.state.loading,
       onLoadMore: this.onLoadMore.bind(this)
     };
 
     return (
-      <View style={{ flex: 1, marginTop: 64 }}>
-        <PullUpListView {...listViewProps}></PullUpListView>
+      <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, marginTop: 64 }}>
+          <PullUpListView {...listViewProps}></PullUpListView>
+        </View>
+        <Toast ref={(toastRef) => this.state.toastRef = toastRef}/>
       </View>
     );
   }
