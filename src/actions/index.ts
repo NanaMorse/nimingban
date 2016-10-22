@@ -59,16 +59,9 @@ export function tryRequestArticleList(id, page = 1, isLoadMore) {
 
     let fetchUrl = Api.API_GET_ARTICLE_LIST(id, page);
 
-    if (id in functionForumsId) {
-      switch (id) {
-        case functionForumsId.SUBSCRIBE_ID : {
-          fetchUrl = Api.API_QUERY_FEED(testUUID, page);
-          break;
-        }
-      }
-    }
+    if (id === functionForumsId.SUBSCRIBE_ID) fetchUrl = Api.API_QUERY_FEED(testUUID, page);
 
-    return fetch(Api.API_GET_ARTICLE_LIST(id, page))
+    return fetch(fetchUrl)
       .then(response => response.json())
       .then(articleList => {
         dispatch(receiveArticleList(articleList, isLoadMore));

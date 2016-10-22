@@ -14,6 +14,8 @@ export const API_GET_IMAGE_FULL_URL = (imageLink, imageExt) => `http://img1.nimi
 
 export const API_POST_REPLY = () => `${HOST}/Home/Forum/doReplyThread.html?${APP_ID_QUERY}`;
 
-export const API_QUERY_FEED = (uuid, page) => `${HOST}/Api/feed?uuid=${uuid}&page=${page}`;
+export const API_QUERY_FEED = (uuid, page) => `${HOST}/Api/feed?uuid=${uuid}&page=${page}&${APP_ID_QUERY}`;
 
 export const API_ADD_FEED = (uuid, tid) => `${HOST}/Api/addFeed?uuid=${uuid}&tid=${tid}&${APP_ID_QUERY}`;
+
+export const API_DEL_FEED = (uuid, tid) => `${HOST}/Api/delFeed?uuid=${uuid}&tid=${tid}&${APP_ID_QUERY}`;

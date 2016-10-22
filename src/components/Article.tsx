@@ -4,7 +4,9 @@ import { Actions } from 'react-native-router-flux';
 const events = require('RCTDeviceEventEmitter');
 import { DRAWER_CLOSED } from '../constants/eventTags';
 import * as AppTools from '../appTools';
-import { API_GET_IMAGE_THUMB_URL, API_ADD_FEED } from '../constants/api';
+import { API_GET_IMAGE_THUMB_URL, API_ADD_FEED, API_DEL_FEED } from '../constants/api';
+import * as functionForumsId from '../constants/functionForumsId';
+
 import LoadingCover from './tools/LoadingCover';
 import PullUpListView from 'react-native-pull-up-listview';
 const HTMLView = require('react-native-htmlview');
@@ -50,10 +52,21 @@ const styles = StyleSheet.create({
   }
 });
 
-const actionSheetButtons = ['订阅', '举报', '取消'];
 const subscribeButtonIndex = 0;
 const reportButtonIndex = 1;
 const cancelButtonIndex = 2;
+
+const actionSheetMap = {
+  [functionForumsId.SUBSCRIBE_ID]: {
+    actionSheetButtons: ['取消订阅', '举报', '取消']
+  },
+
+  defaultMap: {
+    actionSheetButtons: ['订阅', '举报', '取消']
+  }
+};
+
+const testUUID = 'morse';
 
 interface articleProps {
   articleList:any[];
@@ -131,6 +144,12 @@ class Article extends React.Component<articleProps, articleState> {
   }
 
   onLongPressPost(postData: postData) {
+
+    const forumId = this.props.forumInfo.id;
+
+    const actionSheetButtons = (forumId in actionSheetMap ?
+      actionSheetMap[forumId] : actionSheetMap.defaultMap).actionSheetButtons;
+
     ActionSheetIOS.showActionSheetWithOptions({
       options: actionSheetButtons,
       cancelButtonIndex
@@ -138,19 +157,28 @@ class Article extends React.Component<articleProps, articleState> {
       // todo: init subscribe and report
       switch (buttonIndex) {
         case subscribeButtonIndex: {
-          return this.onAddFeed(postData.id);
+          if (this.props.forumInfo.id === functionForumsId.SUBSCRIBE_ID) {
+            return this.onDelFeed(postData.id)
+          } else {
+            return this.onAddFeed(postData.id);
+          }
         }
       }
     });
   }
 
   onAddFeed(tid) {
-    const testUUID = 'morse';
-
     // todo handle add feed failed scene
     fetch(API_ADD_FEED(testUUID, tid))
       .then(response => {
         this.state.toastRef.show('订阅大成功！');
+      });
+  }
+
+  onDelFeed(tid) {
+    fetch(API_DEL_FEED(testUUID, tid))
+      .then(response => {
+        this.state.toastRef.show('取消订阅大成功！');
       });
   }
 
