@@ -15,7 +15,7 @@ import Toast from './tools/Toast';
 import ListViewDataSource = __React.ListViewDataSource;
 import ScrollViewStyle = __React.ScrollViewStyle;
 import ViewStyle = __React.ViewStyle;
-import { postData, nmbActions } from '../interface';
+import { postData, nmbActions, forumData } from '../interface';
 import ReactElement = __React.ReactElement;
 
 
@@ -69,9 +69,9 @@ const actionSheetMap = {
 const testUUID = 'morse';
 
 interface articleProps {
-  articleList:any[];
-  forumInfo:any;
-  title:string;
+  articleList: postData[]
+  forumInfo: forumData
+  title: string
   tryRequestArticleList: Function
 }
 

@@ -21,7 +21,7 @@ export interface forumData {
   status: string
 }
 
-export interface forumListData {
+export interface forumGroupData {
   id: string
   sort: string
   name: string

@@ -15,6 +15,7 @@ const HTMLView = require('react-native-htmlview');
 
 import ViewStyle = __React.ViewStyle;
 import TextStyle = __React.TextStyle;
+import { forumData, forumGroupData } from '../../interface';
 
 // constants start
 const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
@@ -31,7 +32,7 @@ const functionForums = {
       showName: "订阅"
     }
   ]
-};
+} as forumGroupData;
 
 const styles = StyleSheet.create({
   container: {
@@ -61,12 +62,12 @@ const styles = StyleSheet.create({
     color: '#ccc'
   } as TextStyle,
 
-  listWrapper: {
+  groupWrapper: {
     justifyContent: 'flex-start',
     alignItems: 'flex-start'
   } as ViewStyle,
 
-  listHeader: {
+  groupHeader: {
     flexDirection: 'row',
     width: windowWidth,
     height: 40,
@@ -77,7 +78,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1
   } as ViewStyle,
 
-  listHeaderText: {
+  groupHeaderText: {
     color: '#fff'
   } as TextStyle,
 
@@ -114,21 +115,11 @@ const SideMenuHeader = () => {
   );
 };
 
-interface ForumInfo {
-  name: string;
-  showName: string;
-}
-
-interface ForumListInfo {
-  forums: ForumInfo[];
-  name: string;
-}
-
 let onCheckoutDispatch;
 
 const SubListWrapper = (props) => {
 
-  const listItems = props.forums.map((forumInfo: ForumInfo, index) => {
+  const listItems = props.forums.map((forumInfo: forumData, index) => {
 
     const onPress = () => {
       Actions.refresh({key: 'drawer', open: false});
@@ -155,16 +146,16 @@ const SubListWrapper = (props) => {
   );
 };
 
-interface ListWrapperProps {
-  forumListInfo: ForumListInfo;
+interface GroupWrapperProps {
+  forumGroup: forumGroupData;
 }
 
-interface ListWrapperState {
+interface GroupWrapperState {
   showSubListWrapper?: boolean;
   dropDownAnimate?: any
 }
 
-class ListWrapper extends React.Component<ListWrapperProps, ListWrapperState> {
+class GroupWrapper extends React.Component<GroupWrapperProps, GroupWrapperState> {
   constructor() {
     super();
 
@@ -181,7 +172,7 @@ class ListWrapper extends React.Component<ListWrapperProps, ListWrapperState> {
       showSubListWrapper: toShow
     });
 
-    const toValue = toShow ? this.props.forumListInfo.forums.length * 40 : 0;
+    const toValue = toShow ? this.props.forumGroup.forums.length * 40 : 0;
     Animated.timing(this.state.dropDownAnimate, {
       toValue,
       duration: animateDuration
@@ -190,13 +181,13 @@ class ListWrapper extends React.Component<ListWrapperProps, ListWrapperState> {
 
   render() {
 
-    const forumListInfo = this.props.forumListInfo;
+    const forumGroupInfo = this.props.forumGroup;
 
     const ListHeader = () => {
       return (
         <TouchableHighlight onPress={() => this.onSubListWrapperToggled()}>
-          <View style={styles.listHeader}>
-            <Text style={styles.listHeaderText}>{forumListInfo.name}</Text>
+          <View style={styles.groupHeader}>
+            <Text style={styles.groupHeaderText}>{forumGroupInfo.name}</Text>
           </View>
         </TouchableHighlight>
       )
@@ -208,11 +199,11 @@ class ListWrapper extends React.Component<ListWrapperProps, ListWrapperState> {
         {height: this.state.dropDownAnimate}
       ],
       listItemStyle: [styles.subListItem],
-      forums: forumListInfo.forums
+      forums: forumGroupInfo.forums
     };
 
     return (
-      <View style={styles.listWrapper}>
+      <View style={styles.groupWrapper}>
         <ListHeader />
         <SubListWrapper {...subListWrapperProps}/>
       </View>
@@ -222,16 +213,12 @@ class ListWrapper extends React.Component<ListWrapperProps, ListWrapperState> {
 
 interface SideMenuProps {
   show: boolean;
-  forumList: ForumListInfo[];
+  forumList: forumGroupData[];
   tryRequestForumList: Function;
   checkoutForumList: Function;
 }
 
-interface SideMenuState {
-  
-}
-
-class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
+class SideMenu extends React.Component<SideMenuProps, {}> {
   constructor() {
     super();
   }
@@ -245,15 +232,14 @@ class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
 
   render() {
     const forumList = this.props.forumList;
-
     forumList.push(functionForums);
-
+    
     return (
       <View style={styles.container}>
         <View style={styles.sideMenu}>
           <SideMenuHeader />
           <ScrollView>
-            {generateForumListWrappers(forumList)}
+            {generateForumGroups(forumList)}
           </ScrollView>
         </View>
       </View>
@@ -261,9 +247,10 @@ class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
   }
 }
 
-function generateForumListWrappers(forumListData: ForumListInfo[]) {
-  return forumListData.map((forumListInfo, index) => {
-    return <ListWrapper key={index} forumListInfo={forumListInfo}/>
+
+function generateForumGroups(forumList: forumGroupData[]) {
+  return forumList.map((forumGroup, index) => {
+    return <GroupWrapper key={index} forumGroup={forumGroup}/>
   });
 }
 
