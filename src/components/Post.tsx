@@ -46,6 +46,8 @@ const replyButtonIndex = 0;
 const reportButtonIndex = 1;
 const cancelButtonIndex = 2;
 
+const maxReplyNumberOfSinglePage = 19;
+
 interface postProps {
   postData: postData;
   needRequest: boolean;
@@ -57,7 +59,7 @@ interface postState {
   loading?: boolean;
   replys?: replyData[];
   currentPage?: number;
-
+  currentPageLength?: number;
   toastRef?: Toast;
 }
 
@@ -71,7 +73,7 @@ class Post extends React.Component<postProps, postState> {
       loading: false,
       replys: [],
       currentPage: 1,
-
+      currentPageLength: null,
       toastRef: null
     };
     
@@ -87,20 +89,38 @@ class Post extends React.Component<postProps, postState> {
     }
   }
 
-  tryRequestReplys(page = 1, loadMore?) {
-    return fetch(API_GET_REPLY_LIST(this.props.postData.id, page))
+  tryRequestReplys(loadMore?) {
+    let shouldLoadRest = false;
+
+    if (loadMore) {
+      // if current page has load all replys
+      this.state.currentPageLength === maxReplyNumberOfSinglePage ?
+        this.state.currentPage ++ : shouldLoadRest = true;
+    } else {
+      this.state.currentPage = 1;
+    }
+
+    return fetch(API_GET_REPLY_LIST(this.props.postData.id, this.state.currentPage))
       .then(response => response.json())
       .then((postData: postData) => {
 
-        if (!postData.replys.length) {
+        const requestDataLength = postData.replys.length;
+
+        if (!requestDataLength || (shouldLoadRest && requestDataLength === this.state.currentPageLength)) {
           return this.state.toastRef.show('没有更多啦！');
         }
 
-        if (postData.replys.length && loadMore) {
-          this.state.currentPage ++;
+        // update current page's length
+        let replysList: replyData[] = Array.from(this.state.replys);
+        if (loadMore) {
+          const currentPageLength = this.state.currentPageLength;
+          replysList.splice(replysList.length - currentPageLength - 1, currentPageLength, ...postData.replys);
+        } else {
+          replysList = postData.replys;
         }
 
-        this.setState({ replys: loadMore ? [...this.state.replys, ...postData.replys] : postData.replys })
+        this.setState({ replys: replysList });
+        this.state.currentPageLength = requestDataLength;
       })
       .catch(error => console.log(error));
   }
@@ -128,7 +148,7 @@ class Post extends React.Component<postProps, postState> {
 
   onLoadMore() {
     this.setState({ loading: true });
-    this.tryRequestReplys(this.state.currentPage + 1, true).then(() => {
+    this.tryRequestReplys(true).then(() => {
       this.setState({ loading: false });
     });
   }
