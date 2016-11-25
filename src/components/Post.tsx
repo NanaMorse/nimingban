@@ -6,7 +6,7 @@ import { API_GET_IMAGE_THUMB_URL } from '../constants/api'
 import { Actions } from 'react-native-router-flux';
 import PullUpListView from 'react-native-pull-up-listview';
 import Toast from './tools/Toast';
-const HTMLView = require('react-native-htmlview');
+import HTMLView from 'react-native-htmlview'
 
 import ViewStyle = __React.ViewStyle;
 import { postData, replyData, nmbActions } from '../interface';
@@ -207,6 +207,11 @@ class Post extends React.Component<postProps, postState> {
         Linking.canOpenURL(href).then((res) => {
           if (res) Linking.openURL(href);
         }).catch(e => console.log(e));
+      },
+      pressEvents: {
+        'refer': () => {
+          console.log('refer pressed');
+        }
       }
     };
 

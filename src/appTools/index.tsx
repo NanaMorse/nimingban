@@ -8,11 +8,11 @@ export const htmlContentStyles = StyleSheet.create({
   }
 });
 
-export function formatContent(content: string) {
+export function formatContent(content: string): string {
   let result;
 
   // replace /&gt;&gt;No.\d+\b/ to <refer>content</refer>
-  result = content.replace(/(&gt;&gt;No.\d+\b)/gi, function (str) {
+  result = content.replace(/(&gt;&gt;(No.)?\d+\b)/gi, function (str) {
     return `<refer>${str}</refer>`
   });
   

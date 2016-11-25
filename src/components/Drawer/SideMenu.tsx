@@ -11,7 +11,7 @@ import {
 import { Actions } from 'react-native-router-flux';
 import * as functionForumsId from '../../constants/functionForumsId';
 
-const HTMLView = require('react-native-htmlview');
+import HTMLView from 'react-native-htmlview'
 
 import ViewStyle = __React.ViewStyle;
 import TextStyle = __React.TextStyle;

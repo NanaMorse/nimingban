@@ -9,7 +9,7 @@ import * as functionForumsId from '../constants/functionForumsId';
 
 import LoadingCover from './tools/LoadingCover';
 import PullUpListView from 'react-native-pull-up-listview';
-const HTMLView = require('react-native-htmlview');
+import HTMLView from 'react-native-htmlview'
 import Toast from './tools/Toast';
 
 import ListViewDataSource = __React.ListViewDataSource;
@@ -225,8 +225,14 @@ class Article extends React.Component<articleProps, articleState> {
         Linking.canOpenURL(href).then((res) => {
           if (res) Linking.openURL(href);
         }).catch(e => console.log(e));
+      },
+      pressEvents: {
+        'refer': () => {
+          console.log('refer pressed');
+        }
       }
     };
+
 
     return <HTMLView {...props}/>
   }
